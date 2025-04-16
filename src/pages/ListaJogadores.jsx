@@ -1,7 +1,13 @@
 // src/pages/ListaJogadores.jsx (continuação)
 import React, { useState, useEffect } from "react";
 import { Card, Badge, Spinner, Button, Modal, Alert } from "react-bootstrap";
-import { listarJogadores, removerJogador } from "../services/jogadorService";
+import {
+  listarJogadores,
+  removerJogador,
+  calcularMediaGeral,
+} from "../services/jogadorService";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEdit, faTrashCan } from "@fortawesome/free-regular-svg-icons";
 
 const ListaJogadores = () => {
   const [jogadores, setJogadores] = useState([]);
@@ -12,6 +18,15 @@ const ListaJogadores = () => {
   const [showModal, setShowModal] = useState(false);
   const [jogadorParaExcluir, setJogadorParaExcluir] = useState(null);
   const [deletando, setDeletando] = useState(false);
+
+  const ordemHabilidades = [
+    "velocidade",
+    "chute",
+    "passe",
+    "drible",
+    "defesa",
+    "fisico",
+  ];
 
   // Carregar jogadores
   const carregarJogadores = async () => {
@@ -67,19 +82,6 @@ const ListaJogadores = () => {
       jogador.imagem || "https://via.placeholder.com/400/400?text=Sem+Foto"
     );
   };
-  // Cores baseadas no valor da habilidade (estilo FIFA)
-  const getOverallColor = (valor) => {
-    if (valor >= 85) return "#00a651"; // Verde escuro
-    if (valor >= 75) return "#8dc63f"; // Verde claro
-    if (valor >= 65) return "#ffc20e"; // Amarelo
-    if (valor >= 50) return "#f7941d"; // Laranja
-    return "#ed1c24"; // Vermelho
-  };
-
-  // Cor background da posição
-  const getPosicaoClass = (posicao) => {
-    return `position-badge position-${posicao}`;
-  };
 
   if (loading) {
     return (
@@ -108,77 +110,62 @@ const ListaJogadores = () => {
         </Alert>
       )}
 
-      <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
+      <div className="row row-cols-2 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
         {jogadores.map((jogador) => (
           <div className="col" key={jogador.id}>
-            <Card
-              className={`player-card h-100 card-${
-                jogador.geral >= 75 ? "gold" : "silver"
-              }`}
-            >
-              <div className="player-img-container">
-                <img
-                  src={getPlayerImage(jogador)}
-                  alt={jogador.nome}
-                  className="player-img"
-                />
-              </div>
+            <Card className={`player-card h-100`}>
+              <img
+                src={`/public/${jogador.geral >= 75 ? "gold" : "silver"}.png`}
+                alt=""
+              />
+              <div className="col-12 card-content">
+                <div className="player-img-container">
+                  <img
+                    src={getPlayerImage(jogador)}
+                    alt={jogador.nome}
+                    className="player-img"
+                  />
+                </div>
 
-              <div
-                className="overall-badge"
-                style={{ backgroundColor: getOverallColor(jogador.geral) }}
-              >
-                {jogador.geral}
-              </div>
-
-              <Card.Body>
-                <Card.Title className="d-flex justify-content-between align-items-start">
-                  <div>
-                    {jogador.nome}
-                    <div className="mt-1">
-                      <span className={getPosicaoClass(jogador.posicao)}>
-                        {jogador.posicao}
-                      </span>
-                    </div>
+                <div className="overall-position">
+                  <div className="overall-badge">
+                    {calcularMediaGeral(jogador.habilidades, jogador.posicao)}
                   </div>
-                </Card.Title>
+                  <div className="position-badge">{jogador.posicao}</div>
+                </div>
 
-                <div className="mt-3">
-                  <div className="row row-cols-2 g-2">
+                <div className="jogador-nome">{jogador.nome}</div>
+
+                <div className="mt-1 mt-md-3">
+                  <div className="stats-container g-2">
                     {jogador.habilidades &&
-                      Object.entries(jogador.habilidades).map(
-                        ([habilidade, valor]) => (
-                          <div className="col" key={habilidade}>
-                            <div className="d-flex justify-content-between">
-                              <small className="text-capitalize">
-                                {habilidade}
-                              </small>
-                              <small className="fw-bold">{valor}</small>
-                            </div>
-                            <div
-                              className="stat-bar"
-                              style={{
-                                width: `${valor}%`,
-                                backgroundColor: getOverallColor(valor),
-                                maxWidth: "100%",
-                              }}
-                            ></div>
-                          </div>
-                        )
-                      )}
+                      ordemHabilidades.map((habilidade) => (
+                        <div className="col" key={habilidade}>
+                          <small className="stat-value fw-bold">
+                            {jogador.habilidades[habilidade]}
+                          </small>
+                        </div>
+                      ))}
                   </div>
                 </div>
-              </Card.Body>
 
-              <Card.Footer className="text-center">
-                <Button
-                  variant="outline-danger"
-                  size="sm"
-                  onClick={() => confirmarExclusao(jogador)}
-                >
-                  <i className="bi bi-trash"></i> Remover
-                </Button>
-              </Card.Footer>
+                <div className="buttons-container">
+                  <Button
+                    variant="secondary rounded-circle"
+                    size="sm"
+                    onClick={() => alert("Editar")}
+                  >
+                    <FontAwesomeIcon icon={faEdit} />
+                  </Button>
+                  <Button
+                    variant="danger rounded-circle"
+                    size="sm"
+                    onClick={() => confirmarExclusao(jogador)}
+                  >
+                    <FontAwesomeIcon icon={faTrashCan} />
+                  </Button>
+                </div>
+              </div>
             </Card>
           </div>
         ))}

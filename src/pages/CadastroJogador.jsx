@@ -9,15 +9,15 @@ import {
 const CadastroJogador = () => {
   const [jogador, setJogador] = useState({
     nome: "",
-    posicao: "MEIO",
+    posicao: "DEF",
     imagem: "", // URL da imagem
     habilidades: {
+      velocidade: 50,
       chute: 50,
       passe: 50,
       drible: 50,
       defesa: 50,
       fisico: 50,
-      velocidade: 50,
     },
     geral: 50,
   });
@@ -43,7 +43,7 @@ const CadastroJogador = () => {
       [name]: parseInt(value),
     };
 
-    const novoGeral = calcularMediaGeral(novasHabilidades);
+    const novoGeral = calcularMediaGeral(novasHabilidades, jogador.posicao);
 
     setJogador((prev) => ({
       ...prev,
@@ -69,15 +69,15 @@ const CadastroJogador = () => {
       // Resetar formulário
       setJogador({
         nome: "",
-        posicao: "MEIO",
+        posicao: "MEI",
         imagem: "",
         habilidades: {
+          velocidade: 50,
           chute: 50,
           passe: 50,
           drible: 50,
           defesa: 50,
           fisico: 50,
-          velocidade: 50,
         },
         geral: 50,
       });
@@ -143,7 +143,7 @@ const CadastroJogador = () => {
                       onChange={handleChange}
                     >
                       <option value="DEF">Defesa</option>
-                      <option value="MEIO">Meio</option>
+                      <option value="MEI">Meia</option>
                       <option value="ATA">Ataque</option>
                     </Form.Select>
                   </Form.Group>

@@ -13,11 +13,48 @@ import { db } from './firebase';
 
 const COLLECTION_NAME = 'jogadores';
 
+const PESOS_POR_POSICAO = {
+  ATA: {
+    chute: 3.0,
+    velocidade: 2.0,
+    drible: 1.6,
+    fisico: 1.5,
+    passe: 1.3,
+    defesa: 0.6,
+  },
+  MEI: {
+    passe: 3.0,
+    drible: 2.5,
+    velocidade: 1.8,
+    chute: 1.0,
+    defesa: 1.0,
+    fisico: 0.7,
+  },
+  DEF: {
+    defesa: 3.2,
+    fisico: 2.3,
+    passe: 1.7,
+    velocidade: 1.5,
+    chute: 0.8,
+    drible: 0.5
+  }
+};
+
 // Cálculo da média geral do jogador
-export const calcularMediaGeral = (habilidades) => {
-  const valores = Object.values(habilidades);
-  const soma = valores.reduce((acc, valor) => acc + parseInt(valor || 0), 0);
-  return Math.round(soma / valores.length);
+export const calcularMediaGeral = (habilidades, posicao) => {
+  const pesos = PESOS_POR_POSICAO[posicao] || {};
+
+  let somaPonderada = 0;
+  let totalPesos = 0;
+
+  for (const [habilidade, valor] of Object.entries(habilidades)) {
+    const peso = pesos[habilidade] || 1;
+    somaPonderada += valor * peso;
+    totalPesos += peso;
+  }
+
+  const overall = somaPonderada / totalPesos;
+  return Math.round(overall);
 };
 
 // Cadastrar jogador
