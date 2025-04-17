@@ -58,17 +58,18 @@ const SorteioTimes = () => {
 
   // Realizar sorteio
   const realizarSorteio = async () => {
+    console.log(jogadores); // TODO: Atualizar com envio de quantidade de jogadores
     setError("");
     setSorteando(true);
 
     try {
-      if (jogadores.length < 24) {
+      if (jogadores.length < 12) {
         throw new Error(
           "É necessário ter pelo menos 24 jogadores cadastrados para realizar o sorteio"
         );
       }
 
-      const timesSorteados = sortearTimes(jogadores);
+      const timesSorteados = sortearTimes(jogadores, 6);
       setTimes(timesSorteados);
 
       // Salvar no Firebase
@@ -215,7 +216,7 @@ const SorteioTimes = () => {
                 <Button
                   variant="primary"
                   onClick={realizarSorteio}
-                  disabled={sorteando || jogadores.length < 24}
+                  disabled={sorteando || jogadores.length < 12}
                 >
                   {sorteando ? (
                     <>

@@ -13,24 +13,28 @@ const embaralharArray = (array) => {
 };
 
 // Sortear os times conforme as regras especificadas
-export const sortearTimes = (jogadores) => {
-  if (!jogadores || jogadores.length < 24) {
-    throw new Error("É necessário ter pelo menos 24 jogadores para realizar o sorteio");
+export const sortearTimes = (jogadores, jogadoresPorTime) => {
+  if (!jogadores || jogadores.length < jogadoresPorTime * 2) {
+    throw new Error("É necessário ter pelo menos jogadores suficientes para montar 2 times para realizar o sorteio");
   }
+  // TODO: Corrigir quantidade de times e jogadores "extras"
+
+  const numeroDeTimes = Math.floor(jogadores.length / jogadoresPorTime);
+  const numeroDeCoringas = numeroDeTimes * 2;
   
   // Ordenar jogadores por geral (do melhor para o pior)
   const jogadoresOrdenados = [...jogadores].sort((a, b) => b.geral - a.geral);
   
-  // Separar os 8 melhores e os 8 piores
-  const top8 = jogadoresOrdenados.slice(0, 8);
-  const bottom8 = jogadoresOrdenados.slice(-8);
+  // Separar os melhores e os piores
+  const top8 = jogadoresOrdenados.slice(0, numeroDeCoringas);
+  const bottom8 = jogadoresOrdenados.slice(-numeroDeCoringas);
   
   // Embaralhar esses grupos
   const top8Embaralhados = embaralharArray(top8);
   const bottom8Embaralhados = embaralharArray(bottom8);
   
   // Os 16 jogadores intermediários
-  const intermediarios = jogadoresOrdenados.slice(8, jogadoresOrdenados.length - 8);
+  const intermediarios = jogadoresOrdenados.slice(numeroDeCoringas, jogadoresOrdenados.length - numeroDeCoringas);
   const intermediariosEmbaralhados = embaralharArray(intermediarios);
   
   // Criar 4 times vazios
@@ -42,24 +46,24 @@ export const sortearTimes = (jogadores) => {
   ];
   
   // Distribuir 1 top e 1 bottom em cada time
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < numeroDeTimes; i++) {
     times[i].jogadores.push(top8Embaralhados[i]);
     times[i].jogadores.push(bottom8Embaralhados[i]);
   }
   
   // Distribuir os tops restantes
-  for (let i = 4; i < 8; i++) {
-    times[i-4].jogadores.push(top8Embaralhados[i]);
+  for (let i = numeroDeTimes; i < numeroDeCoringas; i++) {
+    times[i-numeroDeTimes].jogadores.push(top8Embaralhados[i]);
   }
   
   // Distribuir os bottoms restantes
-  for (let i = 4; i < 8; i++) {
-    times[i-4].jogadores.push(bottom8Embaralhados[i]);
+  for (let i = numeroDeTimes; i < numeroDeCoringas; i++) {
+    times[i-numeroDeTimes].jogadores.push(bottom8Embaralhados[i]);
   }
   
   // Distribuir os jogadores intermediários
   for (let i = 0; i < intermediariosEmbaralhados.length; i++) {
-    const timeIndex = i % 4;
+    const timeIndex = i % numeroDeTimes;
     times[timeIndex].jogadores.push(intermediariosEmbaralhados[i]);
   }
   

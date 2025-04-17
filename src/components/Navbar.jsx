@@ -7,7 +7,7 @@ const Navbar = () => {
   const location = useLocation();
 
   return (
-    <BootstrapNavbar bg="dark" variant="dark" expand="lg" fixed="bottom">
+    <BootstrapNavbar bg="dark" variant="dark" expand="lg" fixed="top">
       <Container>
         <BootstrapNavbar.Toggle aria-controls="basic-navbar-nav" />
         <BootstrapNavbar.Collapse id="basic-navbar-nav">

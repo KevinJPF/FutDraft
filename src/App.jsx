@@ -15,7 +15,7 @@ function App() {
   return (
     <Router>
       <Navbar />
-      <div className="container mt-4 mb-5 pb-5">
+      <div className="container mt-5 pt-5">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/cadastro" element={<CadastroJogador />} />

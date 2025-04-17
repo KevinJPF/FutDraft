@@ -6,7 +6,9 @@ import { Link } from "react-router-dom";
 const Home = () => {
   return (
     <div className="text-center">
-      <h1 className="mb-4">FutDraft</h1>
+      <h1 className="mb-4">
+        <img src="/public/logo.png" alt="" style={{ height: "10rem" }} />
+      </h1>
 
       <div className="row justify-content-center mt-5">
         <div className="col-md-10">
