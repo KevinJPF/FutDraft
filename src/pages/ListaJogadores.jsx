@@ -111,15 +111,33 @@ const ListaJogadores = () => {
       )}
 
       <div className="row row-cols-2 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
-        {jogadores.map((jogador) => (
+        {jogadores.map((jogador, index) => (
           <div className="col" key={jogador.id}>
-            <Card className={`player-card h-100`}>
+            <Card className={`player-card h-100 justify-content-end`}>
               <img
-                src={`/public/${jogador.geral >= 75 ? "gold" : "silver"}.png`}
+                src={`/public/${
+                  jogador.geral >= 80
+                    ? "gold-r"
+                    : jogador.geral >= 75
+                    ? "gold"
+                    : jogador.geral >= 73
+                    ? "silver-r"
+                    : jogador.geral >= 65
+                    ? "silver"
+                    : jogador.geral >= 62
+                    ? "bronze-r"
+                    : "bronze"
+                }.png`}
                 alt=""
               />
-              <div className="col-12 card-content">
+              <div className={`col-12 card-content`}>
                 <div className="player-img-container">
+                  <div className="overall-position">
+                    <div className="overall-badge">
+                      {calcularMediaGeral(jogador.habilidades, jogador.posicao)}
+                    </div>
+                    <div className="position-badge">{jogador.posicao}</div>
+                  </div>
                   <img
                     src={getPlayerImage(jogador)}
                     alt={jogador.nome}
@@ -127,23 +145,14 @@ const ListaJogadores = () => {
                   />
                 </div>
 
-                <div className="overall-position">
-                  <div className="overall-badge">
-                    {calcularMediaGeral(jogador.habilidades, jogador.posicao)}
-                  </div>
-                  <div className="position-badge">{jogador.posicao}</div>
-                </div>
-
                 <div className="jogador-nome">{jogador.nome}</div>
 
-                <div className="mt-1 mt-md-3">
-                  <div className="stats-container g-2">
+                <div className="">
+                  <div className="stats-container">
                     {jogador.habilidades &&
                       ordemHabilidades.map((habilidade) => (
-                        <div className="col" key={habilidade}>
-                          <small className="stat-value fw-bold">
-                            {jogador.habilidades[habilidade]}
-                          </small>
+                        <div className="stat-value" key={habilidade}>
+                          {jogador.habilidades[habilidade]}
                         </div>
                       ))}
                   </div>
