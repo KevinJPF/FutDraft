@@ -65,7 +65,7 @@ export const cadastrarJogador = async (jogador) => {
       nome: jogador.nome,
       posicao: jogador.posicao,
       habilidades: jogador.habilidades,
-      imagem: jogador.imagem, // URL da imagem fornecida pelo usuário
+      imagem: jogador.imagem != "" ? jogador.imagem : "https://images.vexels.com/media/users/3/130462/isolated/preview/7db804bcbdc99731a2d432435f99597b-football-player-kicking-silhouette.png", // URL da imagem fornecida pelo usuário
       geral: jogador.geral,
       createdAt: new Date()
     });
