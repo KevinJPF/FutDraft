@@ -28,7 +28,7 @@ body {
 .player-img-container {
   /* background-color: #fd7e14; */
   margin-top: 16%;
-  height: 52%;
+  height: 51%;
   width: 100%;
   overflow: hidden;
   display: flex;
@@ -97,7 +97,7 @@ body {
   font-size: 1.5rem;
   width: 100%;
   padding: 0 16px;
-  margin-top: 4%;
+  margin-top: 5%;
   margin-right: 2%;
 }
 
