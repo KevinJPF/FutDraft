@@ -29,8 +29,12 @@ const CadastroJogador = () => {
   // Handle de mudança nos campos de texto
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    const novoGeral = calcularMediaGeral(jogador.habilidades, value);
+
     setJogador((prev) => ({
       ...prev,
+      geral: novoGeral,
       [name]: value,
     }));
   };
