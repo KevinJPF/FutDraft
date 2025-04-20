@@ -5,7 +5,7 @@ body {
 }
 
 .card {
-  background-color: #1a1a1a;
+  background-color: #1a1a1a00;
   color: #e0e0e0;
 }
 
@@ -137,16 +137,22 @@ body {
 .position-DEF {
   background-color: #0d6efd;
   color: white;
+  padding: 0px 4px;
+  border-radius: 4px;
 }
 
-.position-MEIO {
+.position-MEI {
   background-color: #198754;
   color: white;
+  padding: 0px 4px;
+  border-radius: 4px;
 }
 
 .position-ATA {
   background-color: #dc3545;
   color: white;
+  padding: 0px 4px;
+  border-radius: 4px;
 }
 
 .team-card {
@@ -193,11 +199,35 @@ body {
 }
 
 .team-player-img {
+  background-color: white;
   width: 40px;
   height: 40px;
-  border-radius: 50%;
+  border-radius: 4px;
   margin-right: 10px;
-  object-fit: cover;
+  object-fit: contain;
+}
+
+.team-1 .team-player-img {
+  background-color: #dc3545;
+}
+
+.team-2 .team-player-img {
+  background-color: #0d6efd;
+}
+
+.team-3 .team-player-img {
+  background-color: #198754;
+}
+
+.team-4 .team-player-img {
+  background-color: #fd7e14;
+}
+
+.modal-header,
+.modal-body,
+.modal-footer {
+  background-color: #1a1a1a;
+  border-color: #3a3a3a;
 }
 
 /* LG - até 1200px */

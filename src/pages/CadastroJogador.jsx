@@ -58,6 +58,13 @@ const CadastroJogador = () => {
 
   // Submit do formulário
   const handleSubmit = async (e) => {
+    const senha = prompt("Digite a senha para cadastrar um jogador:");
+
+    if (senha !== "Kevinho&Xande2025") {
+      alert("Senha incorreta. Ação cancelada.");
+      return;
+    }
+
     e.preventDefault();
     setLoading(true);
     setError("");
@@ -98,7 +105,7 @@ const CadastroJogador = () => {
 
   // Cores baseadas no valor da habilidade (estilo FIFA)
   const getSkillColor = (valor) => {
-    if (valor >= 85) return "#00a651"; // Verde escuro
+    if (valor >= 80) return "#00a651"; // Verde escuro
     if (valor >= 70) return "#8dc63f"; // Verde claro
     if (valor >= 60) return "#ffc20e"; // Amarelo
     if (valor >= 40) return "#f7941d"; // Laranja

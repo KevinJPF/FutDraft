@@ -2,12 +2,13 @@
 import React from "react";
 import { Card, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import logo from "/logo.png";
 
 const Home = () => {
   return (
     <div className="text-center">
       <h1 className="mb-4">
-        <img src="/public/logo.png" alt="" style={{ height: "10rem" }} />
+        <img src={logo} alt="" style={{ height: "10rem" }} />
       </h1>
 
       <div className="row justify-content-center mt-5">

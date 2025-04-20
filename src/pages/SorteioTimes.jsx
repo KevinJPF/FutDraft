@@ -1,6 +1,19 @@
 // src/pages/SorteioTimes.jsx
 import React, { useState, useEffect, useRef } from "react";
-import { Button, Card, Alert, Spinner, Tabs, Tab } from "react-bootstrap";
+import {
+  Button,
+  Card,
+  Alert,
+  Spinner,
+  Tabs,
+  Tab,
+  Form,
+  Modal,
+  Row,
+  Col,
+  Dropdown,
+  DropdownButton,
+} from "react-bootstrap";
 import { listarJogadores } from "../services/jogadorService";
 import {
   sortearTimes,
@@ -11,6 +24,7 @@ import * as htmlToImage from "html-to-image";
 
 const SorteioTimes = () => {
   const [jogadores, setJogadores] = useState([]);
+  const [jogadoresSelecionados, setJogadoresSelecionados] = useState([]);
   const [times, setTimes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sorteando, setSorteando] = useState(false);
@@ -18,6 +32,9 @@ const SorteioTimes = () => {
   const [historico, setHistorico] = useState([]);
   const [carregandoHistorico, setCarregandoHistorico] = useState(false);
   const [activeTab, setActiveTab] = useState("atual");
+  const [showModal, setShowModal] = useState(false);
+  const [jogadoresPorTime, setJogadoresPorTime] = useState(6);
+  const [salvarNoHistorico, setSalvarNoHistorico] = useState(false);
   const sorteioRef = useRef(null);
 
   // Carregar jogadores ao montar o componente
@@ -56,27 +73,81 @@ const SorteioTimes = () => {
     }
   };
 
-  // Realizar sorteio
-  const realizarSorteio = async () => {
-    console.log(jogadores); // TODO: Atualizar com envio de quantidade de jogadores
+  // Abrir modal para seleção de jogadores
+  const abrirModalSelecaoJogadores = () => {
+    // Preparar jogadores com propriedades para seleção
+    const jogadoresComSelecao = jogadores.map((jogador) => ({
+      ...jogador,
+      participa: jogador.participa || true,
+      prioridade: jogador.prioridade || true,
+    }));
+
+    setJogadoresSelecionados(jogadoresComSelecao);
+    setShowModal(true);
+  };
+
+  // Atualizar participação de um jogador
+  const toggleParticipacao = (id) => {
+    setJogadoresSelecionados((prev) =>
+      prev.map((jogador) => {
+        if (jogador.id === id) {
+          // Se estamos desativando a participação, também removemos a prioridade
+          const participa = !jogador.participa;
+          return {
+            ...jogador,
+            participa,
+            prioridade: participa ? jogador.prioridade : false,
+          };
+        }
+        return jogador;
+      })
+    );
+  };
+
+  // Atualizar prioridade de um jogador
+  const togglePrioridade = (id) => {
+    setJogadoresSelecionados((prev) =>
+      prev.map((jogador) => {
+        if (jogador.id === id) {
+          return {
+            ...jogador,
+            prioridade: !jogador.prioridade,
+          };
+        }
+        return jogador;
+      })
+    );
+  };
+
+  // Confirmar seleção de jogadores e realizar sorteio
+  const confirmarSelecaoERealizarSorteio = () => {
+    const jogadoresSorteio = jogadoresSelecionados.filter((j) => j.participa);
+    setShowModal(false);
+    executarSorteio(jogadoresSorteio);
+  };
+
+  // Executar sorteio
+  const executarSorteio = async (jogadoresSorteio) => {
     setError("");
     setSorteando(true);
 
     try {
-      if (jogadores.length < 12) {
+      const minimoJogadores = jogadoresPorTime * 2;
+      if (jogadoresSorteio.length < minimoJogadores) {
         throw new Error(
-          "É necessário ter pelo menos 24 jogadores cadastrados para realizar o sorteio"
+          `É necessário ter pelo menos ${minimoJogadores} jogadores selecionados para realizar o sorteio`
         );
       }
 
-      const timesSorteados = sortearTimes(jogadores, 6);
+      const timesSorteados = sortearTimes(jogadoresSorteio, jogadoresPorTime);
       setTimes(timesSorteados);
 
-      // Salvar no Firebase
-      await salvarSorteio(timesSorteados);
-
-      // Atualizar histórico
-      await carregarHistorico();
+      // Salvar no Firebase se a opção estiver marcada
+      if (salvarNoHistorico) {
+        await salvarSorteio(timesSorteados);
+        // Atualizar histórico
+        await carregarHistorico();
+      }
 
       // Mudar para a aba atual
       setActiveTab("atual");
@@ -130,6 +201,15 @@ const SorteioTimes = () => {
     });
   };
 
+  // Cores baseadas no valor da habilidade (estilo FIFA)
+  const getSkillColor = (valor) => {
+    if (valor >= 80) return "#00a651"; // Verde escuro
+    if (valor >= 70) return "#8dc63f"; // Verde claro
+    if (valor >= 60) return "#ffc20e"; // Amarelo
+    if (valor >= 40) return "#f7941d"; // Laranja
+    return "#ed1c24"; // Vermelho
+  };
+
   // Renderizar times sorteados
   const renderizarTimes = (timesList) => {
     if (!timesList || timesList.length === 0) return null;
@@ -146,7 +226,7 @@ const SorteioTimes = () => {
                 </div>
               </div>
               <Card.Body className="p-0">
-                {time.jogadores.map((jogador) => (
+                {time.jogadores.map((jogador, index) => (
                   <div className="team-player" key={jogador.id}>
                     <img
                       src={getPlayerImage(jogador)}
@@ -155,8 +235,15 @@ const SorteioTimes = () => {
                     />
                     <div className="flex-grow-1">
                       <div className="d-flex justify-content-between">
-                        <div>{jogador.nome}</div>
-                        <div className="badge bg-secondary">
+                        <div>{`${jogador.nome} ${
+                          index == 0 ? "🃏" : index == 1 ? "♦️" : "♟️"
+                        }`}</div>
+                        <div
+                          className="badge"
+                          style={{
+                            backgroundColor: getSkillColor(jogador.geral),
+                          }}
+                        >
                           {jogador.geral}
                         </div>
                       </div>
@@ -165,6 +252,9 @@ const SorteioTimes = () => {
                       >
                         {jogador.posicao}
                       </small>
+                      {jogador.prioridade && (
+                        <span className="ms-2 badge bg-info">Prioridade</span>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -196,15 +286,52 @@ const SorteioTimes = () => {
           <Card.Body>
             <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
               <div>
-                <h5 className="mb-0">
+                <h5 className="mb-2 mb-md-0">
                   Jogadores disponíveis: {jogadores.length}
                 </h5>
-                <small className="text-muted">
-                  Necessário pelo menos 24 jogadores
-                </small>
               </div>
 
-              <div className="d-flex gap-2">
+              <div className="d-flex flex-wrap gap-2 align-items-center">
+                <DropdownButton
+                  id="dropdown-jogadores-por-time"
+                  title={`${jogadoresPorTime} jogadores por time`}
+                  variant="outline-secondary"
+                >
+                  {[4, 5, 6, 7].map((num) => (
+                    <Dropdown.Item
+                      key={num}
+                      onClick={() => setJogadoresPorTime(num)}
+                      active={jogadoresPorTime === num}
+                    >
+                      {num} jogadores por time
+                    </Dropdown.Item>
+                  ))}
+                </DropdownButton>
+
+                <Form.Check
+                  type="checkbox"
+                  id="salvar-historico"
+                  label="Salvar no histórico"
+                  checked={salvarNoHistorico}
+                  onChange={(e) => {
+                    if (salvarNoHistorico) {
+                      setSalvarNoHistorico(false);
+                      return;
+                    }
+
+                    const senha = prompt(
+                      "Digite a senha para confirmar o salvamento:"
+                    );
+
+                    if (senha === "salvaaemano") {
+                      setSalvarNoHistorico(true);
+                    } else {
+                      alert("Senha incorreta. Ação cancelada.");
+                    }
+                  }}
+                  className="mx-2"
+                />
+
                 <Button
                   variant="outline-primary"
                   onClick={carregarJogadores}
@@ -215,33 +342,123 @@ const SorteioTimes = () => {
 
                 <Button
                   variant="primary"
-                  onClick={realizarSorteio}
-                  disabled={sorteando || jogadores.length < 12}
+                  onClick={abrirModalSelecaoJogadores}
+                  disabled={
+                    sorteando || jogadores.length < jogadoresPorTime * 2
+                  }
                 >
-                  {sorteando ? (
-                    <>
-                      <Spinner
-                        as="span"
-                        animation="border"
-                        size="sm"
-                        role="status"
-                        aria-hidden="true"
-                        className="me-2"
-                      />
-                      Sorteando...
-                    </>
-                  ) : (
-                    <>
-                      <i className="bi bi-shuffle me-2"></i>
-                      Sortear Times
-                    </>
-                  )}
+                  <i className="bi bi-shuffle me-2"></i>
+                  Sortear Times
                 </Button>
               </div>
             </div>
           </Card.Body>
         </Card>
       </div>
+
+      {/* Modal de Seleção de Jogadores */}
+      <Modal
+        show={showModal}
+        onHide={() => setShowModal(false)}
+        size="lg"
+        backdrop="static"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Selecionar Jogadores para o Sorteio</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Alert variant="info">
+            Selecione os jogadores que participarão do sorteio e defina quais
+            têm prioridade. Jogadores com prioridade serão alocados nos times 1
+            e 2.
+          </Alert>
+
+          <div className="mb-3">
+            <Row className="mb-2 fw-bold border-bottom pb-2">
+              <Col xs={6}>Nome do Jogador</Col>
+              <Col xs={2} className="text-center">
+                Geral
+              </Col>
+              <Col xs={2} className="text-center">
+                Participa
+              </Col>
+              <Col xs={2} className="text-center">
+                Prioridade
+              </Col>
+            </Row>
+
+            {jogadoresSelecionados.map((jogador) => (
+              <Row
+                key={jogador.id}
+                className="mb-2 align-items-center py-1 border-bottom"
+              >
+                <Col xs={6}>
+                  <div className="d-flex align-items-center">
+                    <img
+                      src={getPlayerImage(jogador)}
+                      alt={jogador.nome}
+                      className="me-2"
+                      width="30"
+                      height="30"
+                    />
+                    {jogador.nome}
+                  </div>
+                </Col>
+                <Col xs={2} className="text-center">
+                  <span
+                    className="badge"
+                    style={{
+                      backgroundColor: getSkillColor(jogador.geral),
+                    }}
+                  >
+                    {jogador.geral}
+                  </span>
+                </Col>
+                <Col xs={2} className="text-center">
+                  <Form.Check
+                    type="checkbox"
+                    checked={jogador.participa}
+                    onChange={() => toggleParticipacao(jogador.id)}
+                    id={`participa-${jogador.id}`}
+                  />
+                </Col>
+                <Col xs={2} className="text-center">
+                  <Form.Check
+                    type="checkbox"
+                    checked={jogador.prioridade}
+                    onChange={() => togglePrioridade(jogador.id)}
+                    disabled={!jogador.participa}
+                    id={`prioridade-${jogador.id}`}
+                  />
+                </Col>
+              </Row>
+            ))}
+          </div>
+
+          <div className="d-flex justify-content-between align-items-center">
+            <div>
+              Jogadores selecionados:{" "}
+              {jogadoresSelecionados.filter((j) => j.participa).length}
+            </div>
+            <div>Mínimo necessário: {jogadoresPorTime * 2} jogadores</div>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowModal(false)}>
+            Cancelar
+          </Button>
+          <Button
+            variant="primary"
+            onClick={confirmarSelecaoERealizarSorteio}
+            disabled={
+              jogadoresSelecionados.filter((j) => j.participa).length <
+              jogadoresPorTime * 2
+            }
+          >
+            Sortear com Jogadores Selecionados
+          </Button>
+        </Modal.Footer>
+      </Modal>
 
       <Tabs
         activeKey={activeTab}
@@ -280,7 +497,7 @@ const SorteioTimes = () => {
             <div>
               {historico.map((sorteio, index) => (
                 <div key={sorteio.id} className="mb-4">
-                  <h5 className="border-bottom pb-2">
+                  <h5 className="border-bottom py-2 px-2 bg-dark rounded-1">
                     Sorteio {index + 1} - {formatarData(sorteio.data)}
                   </h5>
                   {renderizarTimes(sorteio.times)}
