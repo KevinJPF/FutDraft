@@ -79,13 +79,8 @@ const Regras = () => {
                 durará <strong>10 minutos</strong>.
               </li>
               <li className="mb-3">
-                Caso um dos times abra um placar com <strong>dois gols</strong>{" "}
-                de diferença à partir do
-                <strong> terceiro gol</strong> será considerada vitória.
-                <br /> Exemplos de vitória: 3x1 por dois gols de diferença, 4x2
-                por dois gols de diferença. <br /> Exemplos de não vitória: 3x2
-                apenas 1 gol de diferença, 4x3 apenas 1 gol de diferença, 2x0
-                Ainda não chegou no terceiro gol.
+                Caso um dos times faça <strong>três gols</strong> será
+                considerada vitória.
               </li>
               <li className="mb-3">
                 O goleiro <strong>não pode usar as mãos</strong> em recuos
@@ -142,25 +137,6 @@ const Regras = () => {
             </h4>
             <ul className="ps-4">
               <li className="mb-3">
-                Pontualidade: o jogo começa no horário combinado. Atrasos podem
-                deixar gente de fora.
-              </li>
-              <li className="mb-3">
-                Se não puder ir, avise com antecedência para organizarmos os
-                times.
-              </li>
-              <li className="mb-3">
-                Use calçado adequado! Evite chuteiras com travas altas e cuidado
-                com calçados que não seja uma chuteira society, você VAI
-                ESCORREGAR.
-              </li>
-              <li className="mb-3">
-                Sem goleiro fixo se não houver voluntário — TODOS REVEZAM.
-              </li>
-              <li className="mb-3">
-                Respeite a chamada de "bola saiu". Em dúvida, repete a jogada.
-              </li>
-              <li className="mb-3">
                 Evite jogadas perigosas ou chutes de perto com força
                 desnecessária, isso não é campeonato, somos todos amigos e todo
                 mundo tem que acordar cedo pra trabalhar/estudar.
@@ -169,6 +145,18 @@ const Regras = () => {
                 Ninguém aqui é o Neymar! Não insulte o colega por estar jogando
                 mal ou coisa do tipo. O foco é se divertir, não constranger
                 ninguém.
+              </li>
+              <li className="mb-3">
+                Se não puder ir, avise com antecedência para organizarmos os
+                times.
+              </li>
+              <li className="mb-3">
+                Sem goleiro fixo se não houver voluntário — TODOS REVEZAM.
+              </li>
+              <li className="mb-3">
+                Use calçado adequado! Evite chuteiras com travas altas e cuidado
+                com calçados que não seja uma chuteira society, você VAI
+                ESCORREGAR.
               </li>
             </ul>
           </div>
