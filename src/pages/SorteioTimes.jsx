@@ -15,6 +15,7 @@ import {
   DropdownButton,
   Container,
 } from "react-bootstrap";
+import { aUHXaHEz } from "../utils/opaEIw";
 import { listarJogadores } from "../services/jogadorService";
 import {
   sortearTimes,
@@ -299,7 +300,7 @@ const SorteioTimes = () => {
           <div className="row">
             {times.map((time, index) => (
               <div key={index} className={`col-md-6 mb-4`}>
-                <div className={`team-card team-${(index % 4) + 1}`}>
+                <div className={`team-card team-${index + 1}`}>
                   <div className="team-header">
                     <div className="d-flex justify-content-between align-items-center">
                       <div>{time.nome}</div>
@@ -445,7 +446,7 @@ const SorteioTimes = () => {
                 <div className="row">
                   {item.times.map((time, timeIndex) => (
                     <div key={timeIndex} className="col-md-6 mb-3">
-                      <div className={`team-card team-${(timeIndex % 4) + 1}`}>
+                      <div className={`team-card team-${timeIndex + 1}`}>
                         <div className="team-header">
                           <h5 className="mb-0">Time {timeIndex + 1}</h5>
                         </div>
@@ -606,12 +607,7 @@ const SorteioTimes = () => {
                 label="Salvar este sorteio no histórico"
                 checked={salvarNoHistorico}
                 onChange={(e) => {
-                  const senha = prompt(
-                    "Digite a senha para salvar no histórico:"
-                  );
-
-                  if (senha !== "Kevinho&Xande2025") {
-                    alert("Senha incorreta. Ação cancelada.");
+                  if (!salvarNoHistorico && !aUHXaHEz()) {
                     return;
                   }
                   setSalvarNoHistorico(e.target.checked);

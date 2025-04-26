@@ -31,71 +31,61 @@ export const sortearTimes = (jogadores, jogadoresPorTime) => {
     media: 0
   }));
 
-  // Separar jogadores com e sem prioridade
-  const jogadoresComPrioridade = jogadores.filter(j => j.prioridade);
-  const jogadoresSemPrioridade = jogadores.filter(j => !j.prioridade);
-
-  // Ordenar os jogadores por geral
-  const jogadoresComPrioridadeOrdenados = [...jogadoresComPrioridade].sort((a, b) => b.geral - a.geral);
-  const jogadoresSemPrioridadeOrdenados = [...jogadoresSemPrioridade].sort((a, b) => b.geral - a.geral);
-
-  // Calcular o número de coringas necessários (2 por time, exceto se o último tiver só 1 jogador)
-  const ultimoTimeVaiTer1Jogador = jogadoresRestantes === 1;
-  const totalCoringas = (totalDeTimes - (ultimoTimeVaiTer1Jogador ? 1 : 0)) * 2;
-  const coringasNecessarios = Math.min(totalCoringas, jogadores.length);
-  
-  // Metade dos coringas são top, metade são bottom
-  const topCoringasCount = Math.ceil(coringasNecessarios / 2);
-  const bottomCoringasCount = coringasNecessarios - topCoringasCount;
-
-  // Selecionar coringas com prioridade primeiro para os times 1 e 2
-  let topCoringasComPrioridade = jogadoresComPrioridadeOrdenados.slice(0, topCoringasCount);
-  let bottomCoringasComPrioridade = jogadoresComPrioridadeOrdenados.slice(-bottomCoringasCount);
-  
-  // Se não houver jogadores suficientes com prioridade, complementar com os sem prioridade
-  if (topCoringasComPrioridade.length < topCoringasCount) {
-    const faltam = topCoringasCount - topCoringasComPrioridade.length;
-    topCoringasComPrioridade = [
-      ...topCoringasComPrioridade,
-      ...jogadoresSemPrioridadeOrdenados.slice(0, faltam)
-    ];
-  }
-  
-  if (bottomCoringasComPrioridade.length < bottomCoringasCount) {
-    const faltam = bottomCoringasCount - bottomCoringasComPrioridade.length;
-    bottomCoringasComPrioridade = [
-      ...bottomCoringasComPrioridade,
-      ...jogadoresSemPrioridadeOrdenados.slice(-faltam)
-    ];
+  // Função auxiliar para embaralhar arrays (implementação do algoritmo Fisher-Yates)
+  function embaralharArray(array) {
+    const newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    }
+    return newArray;
   }
 
-  // Embaralhar os coringas
-  const topCoringas = embaralharArray(topCoringasComPrioridade);
-  const bottomCoringas = embaralharArray(bottomCoringasComPrioridade);
+  // Ordenar todos os jogadores por nivel geral (do melhor para o pior)
+  const jogadoresOrdenados = [...jogadores].sort((a, b) => b.geral - a.geral);
   
-  // Remover os coringas da lista de jogadores disponíveis
-  const coringasIds = [...topCoringas, ...bottomCoringas].map(j => j.id);
-  const jogadoresDisponiveis = jogadores.filter(j => !coringasIds.includes(j.id));
+  // Selecionar o dobro de jogadores top e bottom necessários
+  const topNecessarios = totalDeTimes; // 1 por time
+  const bottomNecessarios = totalDeTimes; // 1 por time
+  const topParaSelecao = topNecessarios * 2; // Dobro de tops
+  const bottomParaSelecao = bottomNecessarios * 2; // Dobro de bottoms
   
-  // Separar jogadores disponíveis com e sem prioridade
-  const jogadoresDisponiveisComPrioridade = jogadoresDisponiveis.filter(j => j.prioridade);
-  const jogadoresDisponiveisSemPrioridade = jogadoresDisponiveis.filter(j => !j.prioridade);
+  // Selecionar os N melhores e N piores jogadores
+  const jogadoresTop = jogadoresOrdenados.slice(0, topParaSelecao);
+  const jogadoresBottom = jogadoresOrdenados.slice(-bottomParaSelecao);
   
-  // Embaralhar os jogadores disponíveis
-  const jogadoresComPrioridadeEmbaralhados = embaralharArray(jogadoresDisponiveisComPrioridade);
-  const jogadoresSemPrioridadeEmbaralhados = embaralharArray(jogadoresDisponiveisSemPrioridade);
-
-  // Distribuir 1 top e 1 bottom por time
-  let topIndex = 0;
-  let bottomIndex = 0;
-
+  // Embaralhar os jogadores top e bottom
+  const jogadoresTopEmbaralhados = embaralharArray([...jogadoresTop]);
+  const jogadoresBottomEmbaralhados = embaralharArray([...jogadoresBottom]);
+  
+  // Distribuir 1 top e 1 bottom para cada time
   for (let i = 0; i < totalDeTimes; i++) {
-    if (i === totalDeTimes - 1 && ultimoTimeVaiTer1Jogador) break; // Não adicionar 2 coringas se o último time tiver só 1 jogador
-    if (topIndex < topCoringas.length) times[i].jogadores.push(topCoringas[topIndex++]);
-    if (bottomIndex < bottomCoringas.length) times[i].jogadores.push(bottomCoringas[bottomIndex++]);
+    // Adicionar 1 jogador top para este time
+    times[i].jogadores.push(jogadoresTopEmbaralhados[i]);
+    
+    // Adicionar 1 jogador bottom para este time
+    times[i].jogadores.push(jogadoresBottomEmbaralhados[i]);
   }
 
-  // Distribuir os demais jogadores com prioridade para os times 1 e 2
+  // Identificar os jogadores já distribuídos
+  const jogadoresDistribuidosIds = times.flatMap(time => 
+    time.jogadores.map(jogador => jogador.id)
+  );
+
+  // Jogadores restantes incluem os top e bottom não escolhidos e os jogadores do meio
+  const jogadoresRestantesParaDistribuir = jogadores.filter(j => 
+    !jogadoresDistribuidosIds.includes(j.id)
+  );
+  
+  // Separar os jogadores restantes com e sem prioridade
+  const jogadoresRestantesComPrioridade = jogadoresRestantesParaDistribuir.filter(j => j.prioridade);
+  const jogadoresRestantesSemPrioridade = jogadoresRestantesParaDistribuir.filter(j => !j.prioridade);
+  
+  // Embaralhar os jogadores restantes
+  const jogadoresComPrioridadeEmbaralhados = embaralharArray([...jogadoresRestantesComPrioridade]);
+  const jogadoresSemPrioridadeEmbaralhados = embaralharArray([...jogadoresRestantesSemPrioridade]);
+
+  // Distribuir os jogadores restantes com prioridade para os times 1 e 2
   let indexJogadoresComPrioridade = 0;
   
   for (let i = 0; i < Math.min(2, totalDeTimes); i++) {
@@ -108,7 +98,8 @@ export const sortearTimes = (jogadores, jogadoresPorTime) => {
   let indexJogadoresSemPrioridade = 0;
   
   for (let i = 2; i < totalDeTimes; i++) {
-    const limitePorTime = (i === totalDeTimes - 1) ? (jogadoresRestantes || jogadoresPorTime) : jogadoresPorTime;
+    const limitePorTime = (i === totalDeTimes - 1 && jogadoresRestantes > 0) ? 
+      (jogadoresRestantes || jogadoresPorTime) : jogadoresPorTime;
     
     while (times[i].jogadores.length < limitePorTime && indexJogadoresSemPrioridade < jogadoresSemPrioridadeEmbaralhados.length) {
       times[i].jogadores.push(jogadoresSemPrioridadeEmbaralhados[indexJogadoresSemPrioridade++]);
@@ -124,7 +115,8 @@ export const sortearTimes = (jogadores, jogadoresPorTime) => {
 
   // Se ainda faltam jogadores com prioridade e os times 3+ não estão completos, preenchê-los
   for (let i = 2; i < totalDeTimes; i++) {
-    const limitePorTime = (i === totalDeTimes - 1) ? (jogadoresRestantes || jogadoresPorTime) : jogadoresPorTime;
+    const limitePorTime = (i === totalDeTimes - 1 && jogadoresRestantes > 0) ? 
+      (jogadoresRestantes || jogadoresPorTime) : jogadoresPorTime;
     
     while (times[i].jogadores.length < limitePorTime && indexJogadoresComPrioridade < jogadoresComPrioridadeEmbaralhados.length) {
       times[i].jogadores.push(jogadoresComPrioridadeEmbaralhados[indexJogadoresComPrioridade++]);
@@ -189,4 +181,38 @@ export const obterHistoricoSorteios = async (quantidade = 3) => {
     console.error("Erro ao obter histórico de sorteios:", error);
     throw error;
   }
+};
+
+export const auheauehau = () => {
+  const __uUz = "Digite a senha para salvar no histórico:";
+  const __kLp = "Senha incorreta. Ação cancelada.";
+
+  const __bTf = "RnV0RHJhZnQyMDI1";
+  const __aXv = "V0S2V2aW4mWGFuZGU=";
+
+  function __yxM(c) {
+    return c.split("").reverse().join("");
+  }
+
+  function __qwe(s) {
+    return decodeURIComponent(
+      atob(s)
+        .split("")
+        .map(function (x) {
+          return "%" + ("00" + x.charCodeAt(0).toString(16)).slice(-2);
+        })
+        .join("")
+    );
+  }
+
+  const _pw = prompt(__uUz);
+
+  const __zXp = __bTf + __yxM(__aXv);
+
+  if (_pw !== __qwe(__zXp)) {
+    alert(__kLp);
+    return false;
+  }
+
+  return true;
 };

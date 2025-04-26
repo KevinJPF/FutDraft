@@ -18,6 +18,7 @@ import {
   removerJogador,
   calcularMediaGeral,
 } from "../services/jogadorService";
+import { aUHXaHEz } from "../utils/opaEIw";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faEdit,
@@ -201,14 +202,11 @@ const ListaJogadores = () => {
   };
 
   const handleDelete = (item) => {
-    const senha = prompt("Digite a senha para confirmar a exclusão:");
-
-    if (senha === "Kevinho&Xande2025") {
-      // Aqui você chama sua função de exclusão
-      confirmarExclusao(item);
-    } else {
-      alert("Senha incorreta. Ação cancelada.");
+    if (!aUHXaHEz()) {
+      return;
     }
+
+    confirmarExclusao(item);
   };
 
   // Função para executar exclusão

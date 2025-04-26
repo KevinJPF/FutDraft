@@ -240,11 +240,11 @@ body {
 }
 
 .team-1 .team-header {
-  background-color: #ff5252;
+  background-color: #a300b1;
 }
 
 .team-2 .team-header {
-  background-color: #2196f3;
+  background-color: #ff5252;
 }
 
 .team-3 .team-header {
@@ -252,7 +252,11 @@ body {
 }
 
 .team-4 .team-header {
-  background-color: #ff9800;
+  background-color: #2196f3;
+}
+
+.team-5 .team-header {
+  background-color: #545454;
 }
 
 .team-player {
@@ -282,11 +286,11 @@ body {
 }
 
 .team-1 .team-player-img {
-  border-color: #ff5252;
+  border-color: #a300b1;
 }
 
 .team-2 .team-player-img {
-  border-color: #2196f3;
+  border-color: #ff5252;
 }
 
 .team-3 .team-player-img {
@@ -294,7 +298,11 @@ body {
 }
 
 .team-4 .team-player-img {
-  border-color: #ff9800;
+  border-color: #2196f3;
+}
+
+.team-5 .team-player-img {
+  border-color: #545454;
 }
 
 .position-DEF {

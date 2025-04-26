@@ -1,6 +1,7 @@
 // src/pages/CadastroJogador.jsx
 import React, { useState } from "react";
 import { Form, Button, Alert, Image } from "react-bootstrap";
+import { aUHXaHEz } from "../utils/opaEIw";
 import {
   cadastrarJogador,
   calcularMediaGeral,
@@ -58,10 +59,7 @@ const CadastroJogador = () => {
 
   // Submit do formulário
   const handleSubmit = async (e) => {
-    const senha = prompt("Digite a senha para cadastrar um jogador:");
-
-    if (senha !== "Kevinho&Xande2025") {
-      alert("Senha incorreta. Ação cancelada.");
+    if (!aUHXaHEz()) {
       return;
     }
 
