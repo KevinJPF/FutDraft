@@ -13,6 +13,7 @@ import {
   Col,
   Dropdown,
   DropdownButton,
+  Container,
 } from "react-bootstrap";
 import { listarJogadores } from "../services/jogadorService";
 import {
@@ -166,7 +167,7 @@ const SorteioTimes = () => {
     try {
       const dataUrl = await htmlToImage.toPng(sorteioRef.current, {
         quality: 0.95,
-        backgroundColor: "white",
+        backgroundColor: "#121212",
       });
 
       // Criar link para download
@@ -177,14 +178,336 @@ const SorteioTimes = () => {
       link.href = dataUrl;
       link.click();
     } catch (err) {
-      console.error("Erro ao exportar imagem:", err);
-      alert("Erro ao gerar imagem. Tente novamente.");
+      setError("Erro ao exportar imagem");
+      console.error(err);
     }
   };
 
-  // Placeholder image se o jogador não tiver foto
-  const getPlayerImage = (jogador) => {
-    return jogador.imagem || "/api/placeholder/40/40";
+  // Renderizar jogador no modal de seleção
+  const renderJogadorSelecao = (jogador) => {
+    const { id, nome, posicao, geral, imagem, participa, prioridade } = jogador;
+    const getPlayerImage = (url) => {
+      return url || "https://via.placeholder.com/150?text=Sem+Foto";
+    };
+
+    return (
+      <div
+        key={id}
+        className={`d-flex align-items-center p-2 my-1 rounded ${
+          participa ? "bg-dark" : "bg-secondary bg-opacity-25"
+        }`}
+      >
+        <div className="form-check form-switch me-2">
+          <input
+            className="form-check-input"
+            type="checkbox"
+            checked={participa}
+            onChange={() => toggleParticipacao(id)}
+            id={`participa-${id}`}
+          />
+        </div>
+
+        <img
+          src={getPlayerImage(imagem)}
+          alt={nome}
+          className="rounded-circle"
+          style={{ width: "36px", height: "36px", objectFit: "cover" }}
+        />
+
+        <div className="ms-3 flex-grow-1">
+          <div className="d-flex justify-content-between align-items-center">
+            <div>
+              <span className="fw-bold">{nome}</span>
+              <span className={`ms-2 badge position-${posicao}`}>
+                {posicao}
+              </span>
+            </div>
+            <span
+              className="badge"
+              style={{
+                backgroundColor:
+                  geral >= 80
+                    ? "#00a651"
+                    : geral >= 70
+                    ? "#8dc63f"
+                    : geral >= 60
+                    ? "#ffc20e"
+                    : geral >= 40
+                    ? "#f7941d"
+                    : "#ed1c24",
+              }}
+            >
+              {geral}
+            </span>
+          </div>
+        </div>
+
+        {participa && (
+          <div className="form-check ms-2">
+            <input
+              className="form-check-input"
+              type="checkbox"
+              checked={prioridade}
+              onChange={() => togglePrioridade(id)}
+              id={`prioridade-${id}`}
+            />
+            <label className="form-check-label" htmlFor={`prioridade-${id}`}>
+              Prioridade
+            </label>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // Renderizar times sorteados
+  const renderTimesSorteados = () => {
+    if (!times.length) {
+      return (
+        <div className="text-center my-5">
+          <p>Nenhum sorteio realizado ainda.</p>
+          <Button
+            variant="outline-primary"
+            onClick={abrirModalSelecaoJogadores}
+            className="mt-3 px-4 py-2"
+          >
+            Realizar Sorteio
+          </Button>
+        </div>
+      );
+    }
+
+    return (
+      <div>
+        <div className="d-flex justify-content-between mb-4">
+          <h3 className="mb-0">Times Sorteados</h3>
+          <div>
+            <Button
+              variant="outline-primary"
+              onClick={exportarComoImagem}
+              className="me-2"
+            >
+              <i className="bi bi-download me-1"></i> Baixar Imagem
+            </Button>
+            <Button variant="primary" onClick={abrirModalSelecaoJogadores}>
+              Novo Sorteio
+            </Button>
+          </div>
+        </div>
+
+        <div ref={sorteioRef} className="p-3 rounded">
+          <div className="row">
+            {times.map((time, index) => (
+              <div key={index} className={`col-md-6 mb-4`}>
+                <div className={`team-card team-${(index % 4) + 1}`}>
+                  <div className="team-header">
+                    <div className="d-flex justify-content-between align-items-center">
+                      <div>{time.nome}</div>
+                      <div
+                        className="ms-2 badge"
+                        style={{
+                          backgroundColor:
+                            time.media >= 80
+                              ? "#00a651"
+                              : time.media >= 70
+                              ? "#8dc63f"
+                              : time.media >= 60
+                              ? "#ffc20e"
+                              : time.media >= 40
+                              ? "#f7941d"
+                              : "#ed1c24",
+                        }}
+                      >
+                        {time.media}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-0">
+                    {time.jogadores.map((jogador, index) => (
+                      <div key={jogador.id} className="team-player">
+                        <img
+                          src={
+                            jogador.imagem ||
+                            "https://via.placeholder.com/40?text=?"
+                          }
+                          alt={jogador.nome}
+                          className="team-player-img"
+                        />
+                        <div className="flex-grow-1">
+                          <div className="d-flex justify-content-between align-items-center">
+                            <span
+                              className="fw-bold text-truncate"
+                              style={{
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap",
+                                display: "inline-block",
+                              }}
+                            >
+                              {`${
+                                index === 0 ? "🦄" : index === 1 ? "🦊" : "🦝"
+                              } ${jogador.nome}`}
+                            </span>
+
+                            <div className="flex-shrink-0">
+                              <span className={`badge`}>
+                                {jogador.prioridade ? "⚽" : ""}
+                              </span>
+                              <span
+                                className={`badge position-${jogador.posicao}`}
+                              >
+                                {jogador.posicao}
+                              </span>
+                              <span
+                                className="ms-2 badge"
+                                style={{
+                                  backgroundColor:
+                                    jogador.geral >= 80
+                                      ? "#00a651"
+                                      : jogador.geral >= 70
+                                      ? "#8dc63f"
+                                      : jogador.geral >= 60
+                                      ? "#ffc20e"
+                                      : jogador.geral >= 40
+                                      ? "#f7941d"
+                                      : "#ed1c24",
+                                }}
+                              >
+                                {jogador.geral}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Renderizar histórico de sorteios
+  const renderHistoricoSorteios = () => {
+    if (carregandoHistorico) {
+      return (
+        <div className="text-center my-5">
+          <Spinner animation="border" variant="primary" />
+          <p className="mt-3">Carregando histórico...</p>
+        </div>
+      );
+    }
+
+    if (!historico.length) {
+      return (
+        <Alert variant="info" className="my-4">
+          Nenhum sorteio salvo no histórico.
+        </Alert>
+      );
+    }
+
+    return (
+      <div className="accordion" id="historicoSorteios">
+        {historico.map((item, index) => (
+          <div
+            className="accordion-item bg-dark mb-3 border border-secondary"
+            key={index}
+          >
+            <h2 className="accordion-header" id={`heading-${index}`}>
+              <button
+                className="accordion-button collapsed bg-dark text-light"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target={`#collapse-${index}`}
+                aria-expanded="false"
+                aria-controls={`collapse-${index}`}
+              >
+                <div className="d-flex justify-content-between w-100 align-items-center">
+                  <span>
+                    Sorteio {index + 1} - {formatarData(Date(item.data))}
+                  </span>
+                  <span className="badge bg-primary ms-2">
+                    {item.times.length} Times
+                  </span>
+                </div>
+              </button>
+            </h2>
+            <div
+              id={`collapse-${index}`}
+              className="accordion-collapse collapse"
+              aria-labelledby={`heading-${index}`}
+              data-bs-parent="#historicoSorteios"
+            >
+              <div className="accordion-body p-3">
+                <div className="row">
+                  {item.times.map((time, timeIndex) => (
+                    <div key={timeIndex} className="col-md-6 mb-3">
+                      <div className={`team-card team-${(timeIndex % 4) + 1}`}>
+                        <div className="team-header">
+                          <h5 className="mb-0">Time {timeIndex + 1}</h5>
+                        </div>
+                        <div className="p-0">
+                          {time.jogadores.map((jogador, index) => (
+                            <div key={jogador.id} className="team-player">
+                              <img
+                                src={
+                                  jogador.imagem ||
+                                  "https://via.placeholder.com/40?text=?"
+                                }
+                                alt={jogador.nome}
+                                className="team-player-img"
+                              />
+                              <div className="flex-grow-1">
+                                <div className="d-flex justify-content-between align-items-center">
+                                  {`${
+                                    index === 0
+                                      ? "🦄"
+                                      : index === 1
+                                      ? "🦊"
+                                      : "🦝"
+                                  } ${jogador.nome}`}
+                                  <div>
+                                    <span
+                                      className={`ms-2 badge position-${jogador.posicao}`}
+                                    >
+                                      {jogador.posicao}
+                                    </span>
+                                    <span
+                                      className="ms-2 badge"
+                                      style={{
+                                        backgroundColor:
+                                          jogador.geral >= 80
+                                            ? "#00a651"
+                                            : jogador.geral >= 70
+                                            ? "#8dc63f"
+                                            : jogador.geral >= 60
+                                            ? "#ffc20e"
+                                            : jogador.geral >= 40
+                                            ? "#f7941d"
+                                            : "#ed1c24",
+                                      }}
+                                    >
+                                      {jogador.geral}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
   };
 
   // Formatar data
@@ -201,247 +524,134 @@ const SorteioTimes = () => {
     });
   };
 
-  // Cores baseadas no valor da habilidade (estilo FIFA)
-  const getSkillColor = (valor) => {
-    if (valor >= 80) return "#00a651"; // Verde escuro
-    if (valor >= 70) return "#8dc63f"; // Verde claro
-    if (valor >= 60) return "#ffc20e"; // Amarelo
-    if (valor >= 40) return "#f7941d"; // Laranja
-    return "#ed1c24"; // Vermelho
-  };
-
-  // Renderizar times sorteados
-  const renderizarTimes = (timesList) => {
-    if (!timesList || timesList.length === 0) return null;
-
-    return (
-      <div className="row row-cols-1 row-cols-sm-2 g-3" ref={sorteioRef}>
-        {timesList.map((time) => (
-          <div className="col" key={time.id}>
-            <Card className={`team-card team-${time.id}`}>
-              <div className="team-header">
-                <div className="d-flex justify-content-between align-items-center">
-                  <div>{time.nome}</div>
-                  <div>Média: {time.media}</div>
-                </div>
-              </div>
-              <Card.Body className="p-0">
-                {time.jogadores.map((jogador, index) => (
-                  <div className="team-player" key={jogador.id}>
-                    <img
-                      src={getPlayerImage(jogador)}
-                      alt={jogador.nome}
-                      className="team-player-img"
-                    />
-                    <div className="flex-grow-1">
-                      <div className="d-flex justify-content-between">
-                        <div>{`${jogador.nome} ${
-                          index == 0 ? "🃏" : index == 1 ? "♦️" : "♟️"
-                        }`}</div>
-                        <div
-                          className="badge"
-                          style={{
-                            backgroundColor: getSkillColor(jogador.geral),
-                          }}
-                        >
-                          {jogador.geral}
-                        </div>
-                      </div>
-                      <small
-                        className={`position-badge position-${jogador.posicao}`}
-                      >
-                        {jogador.posicao}
-                      </small>
-                      {jogador.prioridade && (
-                        <span className="ms-2 badge bg-info">Prioridade</span>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </Card.Body>
-            </Card>
-          </div>
-        ))}
-      </div>
-    );
-  };
-
   if (loading) {
     return (
-      <div className="text-center my-5">
-        <Spinner animation="border" variant="primary" />
-        <p className="mt-3">Carregando jogadores...</p>
+      <div
+        className="d-flex flex-column align-items-center justify-content-center"
+        style={{ minHeight: "60vh" }}
+      >
+        <Spinner
+          animation="border"
+          className="mb-3"
+          style={{ width: "3rem", height: "3rem", borderWidth: "0.25rem" }}
+        />
+        <p className="text-center text-secondary">Carregando jogadores...</p>
       </div>
     );
   }
 
   return (
-    <div>
-      <h2 className="text-center mb-4">Sorteio de Times</h2>
+    <div className="container mt-4">
+      <h2 className="text-center mb-4">
+        <span style={{ color: "#39ff14" }}>Sorteio</span> de Times
+      </h2>
 
-      {error && <Alert variant="danger">{error}</Alert>}
+      {error && (
+        <Alert variant="danger" className="mb-4 shadow-sm">
+          {error}
+        </Alert>
+      )}
 
-      <div className="mb-4">
-        <Card>
-          <Card.Body>
-            <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
-              <div>
-                <h5 className="mb-2 mb-md-0">
-                  Jogadores disponíveis: {jogadores.length}
-                </h5>
-              </div>
+      <Tabs
+        activeKey={activeTab}
+        onSelect={(k) => setActiveTab(k)}
+        className="mb-4"
+      >
+        <Tab eventKey="atual" title="Sorteio Atual">
+          {renderTimesSorteados()}
+        </Tab>
+        <Tab eventKey="historico" title="Histórico">
+          {renderHistoricoSorteios()}
+        </Tab>
+      </Tabs>
 
-              <div className="d-flex flex-wrap gap-2 align-items-center">
-                <DropdownButton
-                  id="dropdown-jogadores-por-time"
-                  title={`${jogadoresPorTime} jogadores por time`}
-                  variant="outline-secondary"
-                >
-                  {[4, 5, 6, 7].map((num) => (
-                    <Dropdown.Item
-                      key={num}
-                      onClick={() => setJogadoresPorTime(num)}
-                      active={jogadoresPorTime === num}
-                    >
-                      {num} jogadores por time
-                    </Dropdown.Item>
-                  ))}
-                </DropdownButton>
-
-                <Form.Check
-                  type="checkbox"
-                  id="salvar-historico"
-                  label="Salvar no histórico"
-                  checked={salvarNoHistorico}
-                  onChange={(e) => {
-                    if (salvarNoHistorico) {
-                      setSalvarNoHistorico(false);
-                      return;
-                    }
-
-                    const senha = prompt(
-                      "Digite a senha para confirmar o salvamento:"
-                    );
-
-                    if (senha === "salvaaemano") {
-                      setSalvarNoHistorico(true);
-                    } else {
-                      alert("Senha incorreta. Ação cancelada.");
-                    }
-                  }}
-                  className="mx-2"
-                />
-
-                <Button
-                  variant="outline-primary"
-                  onClick={carregarJogadores}
-                  disabled={sorteando}
-                >
-                  <i className="bi bi-arrow-clockwise me-1"></i> Atualizar
-                </Button>
-
-                <Button
-                  variant="primary"
-                  onClick={abrirModalSelecaoJogadores}
-                  disabled={
-                    sorteando || jogadores.length < jogadoresPorTime * 2
-                  }
-                >
-                  <i className="bi bi-shuffle me-2"></i>
-                  Sortear Times
-                </Button>
-              </div>
-            </div>
-          </Card.Body>
-        </Card>
-      </div>
-
-      {/* Modal de Seleção de Jogadores */}
+      {/* Modal de seleção de jogadores */}
       <Modal
         show={showModal}
         onHide={() => setShowModal(false)}
         size="lg"
         backdrop="static"
+        centered
       >
         <Modal.Header closeButton>
           <Modal.Title>Selecionar Jogadores para o Sorteio</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Alert variant="info">
-            Selecione os jogadores que participarão do sorteio e defina quais
-            têm prioridade. Jogadores com prioridade serão alocados nos times 1
-            e 2.
-          </Alert>
+          <Form>
+            <Form.Group className="mb-3">
+              <Form.Label>Jogadores por Time</Form.Label>
+              <div className="d-flex align-items-center gap-3">
+                <Form.Range
+                  min={2}
+                  max={11}
+                  value={jogadoresPorTime}
+                  onChange={(e) =>
+                    setJogadoresPorTime(parseInt(e.target.value))
+                  }
+                  className="flex-grow-1"
+                />
+                <div
+                  className="badge bg-primary rounded-pill px-3 py-2"
+                  style={{ minWidth: "42px", fontSize: "1rem" }}
+                >
+                  {jogadoresPorTime}
+                </div>
+              </div>
+            </Form.Group>
 
-          <div className="mb-3">
-            <Row className="mb-2 fw-bold border-bottom pb-2">
-              <Col xs={6}>Nome do Jogador</Col>
-              <Col xs={2} className="text-center">
-                Geral
-              </Col>
-              <Col xs={2} className="text-center">
-                Participa
-              </Col>
-              <Col xs={2} className="text-center">
-                Prioridade
-              </Col>
-            </Row>
+            <div className="d-flex justify-content-between mb-3">
+              <Form.Check
+                type="switch"
+                id="salvar-historico"
+                label="Salvar este sorteio no histórico"
+                checked={salvarNoHistorico}
+                onChange={(e) => {
+                  const senha = prompt(
+                    "Digite a senha para salvar no histórico:"
+                  );
 
-            {jogadoresSelecionados.map((jogador) => (
-              <Row
-                key={jogador.id}
-                className="mb-2 align-items-center py-1 border-bottom"
-              >
-                <Col xs={6}>
-                  <div className="d-flex align-items-center">
-                    <img
-                      src={getPlayerImage(jogador)}
-                      alt={jogador.nome}
-                      className="me-2"
-                      width="30"
-                      height="30"
-                    />
-                    {jogador.nome}
-                  </div>
-                </Col>
-                <Col xs={2} className="text-center">
-                  <span
-                    className="badge"
-                    style={{
-                      backgroundColor: getSkillColor(jogador.geral),
-                    }}
-                  >
-                    {jogador.geral}
-                  </span>
-                </Col>
-                <Col xs={2} className="text-center">
-                  <Form.Check
-                    type="checkbox"
-                    checked={jogador.participa}
-                    onChange={() => toggleParticipacao(jogador.id)}
-                    id={`participa-${jogador.id}`}
-                  />
-                </Col>
-                <Col xs={2} className="text-center">
-                  <Form.Check
-                    type="checkbox"
-                    checked={jogador.prioridade}
-                    onChange={() => togglePrioridade(jogador.id)}
-                    disabled={!jogador.participa}
-                    id={`prioridade-${jogador.id}`}
-                  />
-                </Col>
-              </Row>
-            ))}
-          </div>
+                  if (senha !== "Kevinho&Xande2025") {
+                    alert("Senha incorreta. Ação cancelada.");
+                    return;
+                  }
+                  setSalvarNoHistorico(e.target.checked);
+                }}
+              />
 
-          <div className="d-flex justify-content-between align-items-center">
-            <div>
-              Jogadores selecionados:{" "}
-              {jogadoresSelecionados.filter((j) => j.participa).length}
+              <div>
+                <Button
+                  variant="outline-primary"
+                  size="sm"
+                  onClick={() => {
+                    setJogadoresSelecionados((prev) =>
+                      prev.map((j) => ({ ...j, participa: true }))
+                    );
+                  }}
+                  className="me-2"
+                >
+                  Selecionar Todos
+                </Button>
+                <Button
+                  variant="outline-secondary"
+                  size="sm"
+                  onClick={() => {
+                    setJogadoresSelecionados((prev) =>
+                      prev.map((j) => ({ ...j, participa: false }))
+                    );
+                  }}
+                >
+                  Limpar Seleção
+                </Button>
+              </div>
             </div>
-            <div>Mínimo necessário: {jogadoresPorTime * 2} jogadores</div>
-          </div>
+
+            <div
+              className="selecao-jogadores mt-3"
+              style={{ maxHeight: "50vh", overflowY: "auto" }}
+            >
+              {jogadoresSelecionados.map(renderJogadorSelecao)}
+            </div>
+          </Form>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowModal(false)}>
@@ -450,67 +660,26 @@ const SorteioTimes = () => {
           <Button
             variant="primary"
             onClick={confirmarSelecaoERealizarSorteio}
-            disabled={
-              jogadoresSelecionados.filter((j) => j.participa).length <
-              jogadoresPorTime * 2
-            }
+            disabled={sorteando}
           >
-            Sortear com Jogadores Selecionados
+            {sorteando ? (
+              <>
+                <Spinner
+                  as="span"
+                  animation="border"
+                  size="sm"
+                  role="status"
+                  aria-hidden="true"
+                  className="me-2"
+                />
+                Sorteando...
+              </>
+            ) : (
+              "Sortear Times"
+            )}
           </Button>
         </Modal.Footer>
       </Modal>
-
-      <Tabs
-        activeKey={activeTab}
-        onSelect={(k) => setActiveTab(k)}
-        className="mb-4"
-      >
-        <Tab eventKey="atual" title="Sorteio Atual">
-          {times.length > 0 ? (
-            <div>
-              <div className="d-flex justify-content-end mb-3">
-                <Button
-                  variant="success"
-                  onClick={exportarComoImagem}
-                  size="sm"
-                >
-                  <i className="bi bi-download me-1"></i> Exportar para WhatsApp
-                </Button>
-              </div>
-              {renderizarTimes(times)}
-            </div>
-          ) : (
-            <Alert variant="info">
-              Nenhum sorteio realizado ainda. Clique em "Sortear Times" para
-              iniciar!
-            </Alert>
-          )}
-        </Tab>
-
-        <Tab eventKey="historico" title="Histórico de Sorteios">
-          {carregandoHistorico ? (
-            <div className="text-center my-4">
-              <Spinner animation="border" variant="primary" size="sm" />
-              <p className="mt-2">Carregando histórico...</p>
-            </div>
-          ) : historico.length > 0 ? (
-            <div>
-              {historico.map((sorteio, index) => (
-                <div key={sorteio.id} className="mb-4">
-                  <h5 className="border-bottom py-2 px-2 bg-dark rounded-1">
-                    Sorteio {index + 1} - {formatarData(sorteio.data)}
-                  </h5>
-                  {renderizarTimes(sorteio.times)}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <Alert variant="info">
-              Nenhum histórico de sorteio encontrado.
-            </Alert>
-          )}
-        </Tab>
-      </Tabs>
     </div>
   );
 };

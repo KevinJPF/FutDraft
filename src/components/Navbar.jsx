@@ -60,6 +60,7 @@ const Navbar = () => {
               as={Link}
               to="/regras"
               active={location.pathname === "/regras"}
+              onClick={handleNavClick}
             >
               <i className="bi bi-book-fill"></i> Regras
             </Nav.Link>

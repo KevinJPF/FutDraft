@@ -1,14 +1,79 @@
-/* src/App.css */
+:root {
+  --neon-green: #39ff14;
+  --dark-bg: #121212;
+  --darker-bg: #0a0a0a;
+  --card-bg: #1e1e1e;
+  --text-primary: #f8f8f8;
+  --text-secondary: #b0b0b0;
+  --border-color: #333;
+}
+
 body {
-  background-color: #0e0e0e;
+  background-color: var(--dark-bg);
+  color: var(--text-primary);
+  font-family: "Inter", "Segoe UI", system-ui, sans-serif;
   padding-bottom: 60px;
 }
 
+/* Card styling */
 .card {
-  background-color: #1a1a1a00;
-  color: #e0e0e0;
+  background-color: var(--dark-bg);
+  /* border: 1px solid var(--border-color); */
+  /* border-radius: 12px; */
+  /* box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); */
+  color: var(--text-primary);
+  transition: all 0.2s ease;
 }
 
+/* Buttons styling */
+.btn-primary {
+  background-color: var(--neon-green);
+  border-color: var(--neon-green);
+  color: var(--darker-bg);
+  font-weight: 600;
+  box-shadow: 0 0 10px rgba(57, 255, 20, 0.5);
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: #2ce00d;
+  border-color: #2ce00d;
+  color: var(--darker-bg);
+  box-shadow: 0 0 15px rgba(57, 255, 20, 0.7);
+}
+
+.btn-secondary {
+  background-color: #333;
+  border-color: #444;
+  color: var(--text-primary);
+}
+
+.btn-secondary:hover {
+  background-color: #444;
+  border-color: #555;
+}
+
+.btn-outline-primary {
+  color: var(--neon-green);
+  border-color: var(--neon-green);
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--neon-green);
+  color: var(--darker-bg);
+}
+
+.btn-success {
+  background-color: #00b894;
+  border-color: #00b894;
+}
+
+.btn-danger {
+  background-color: #ff5252;
+  border-color: #ff5252;
+}
+
+/* Player card style */
 .player-card {
   position: relative;
   overflow: hidden;
@@ -155,43 +220,51 @@ body {
   border-radius: 4px;
 }
 
+/* Team cards */
 .team-card {
-  background-color: #1a1a1a;
-  border-radius: 10px;
-  border: 2px solid #2e2e2e;
+  background-color: var(--card-bg);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
   margin-bottom: 20px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
 }
 
 .team-header {
-  padding: 10px;
-  border-radius: 8px 8px 0 0;
-  font-weight: bold;
-  background-color: #00c896; /* cor destaque */
-  color: #0e0e0e;
+  padding: 12px;
+  border-radius: 0;
+  font-weight: 600;
+  background-color: var(--neon-green);
+  color: var(--darker-bg);
   text-align: center;
 }
 
 .team-1 .team-header {
-  background-color: #dc3545;
+  background-color: #ff5252;
 }
 
 .team-2 .team-header {
-  background-color: #0d6efd;
+  background-color: #2196f3;
 }
 
 .team-3 .team-header {
-  background-color: #198754;
+  background-color: #00b894;
 }
 
 .team-4 .team-header {
-  background-color: #fd7e14;
+  background-color: #ff9800;
 }
 
 .team-player {
   display: flex;
   align-items: center;
-  padding: 8px;
-  border-bottom: 1px solid #dee2e6;
+  padding: 12px;
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color 0.2s;
+}
+
+.team-player:hover {
+  background-color: #252525;
 }
 
 .team-player:last-child {
@@ -199,38 +272,201 @@ body {
 }
 
 .team-player-img {
-  background-color: white;
   width: 40px;
   height: 40px;
-  border-radius: 4px;
-  margin-right: 10px;
+  border-radius: 50%;
+  margin-right: 12px;
   object-fit: contain;
+  background-color: #2a2a2a;
+  border: 2px solid var(--border-color);
 }
 
 .team-1 .team-player-img {
-  background-color: #dc3545;
+  border-color: #ff5252;
 }
 
 .team-2 .team-player-img {
-  background-color: #0d6efd;
+  border-color: #2196f3;
 }
 
 .team-3 .team-player-img {
-  background-color: #198754;
+  border-color: var(--neon-green);
 }
 
 .team-4 .team-player-img {
-  background-color: #fd7e14;
+  border-color: #ff9800;
+}
+
+.position-DEF {
+  background-color: #2196f3;
+  color: white;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+}
+
+.position-MEI {
+  background-color: var(--neon-green);
+  color: var(--darker-bg);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+}
+
+.position-ATA {
+  background-color: #ff5252;
+  color: white;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+}
+
+/* Modal styling */
+.modal-content {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
 }
 
 .modal-header,
-.modal-body,
 .modal-footer {
-  background-color: #1a1a1a;
-  border-color: #3a3a3a;
+  background-color: #252525;
+  border-color: var(--border-color);
+  color: var(--text-primary);
 }
 
-/* LG - até 1200px */
+.modal-body {
+  background-color: var(--card-bg);
+  border-color: var(--border-color);
+}
+
+/* Tabs styling */
+.nav-tabs {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.nav-tabs .nav-link {
+  color: var(--text-secondary);
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  padding: 10px 16px;
+  margin-right: 2px;
+  font-weight: 500;
+}
+
+.nav-tabs .nav-link:hover {
+  border-color: transparent;
+  color: var(--neon-green);
+}
+
+.nav-tabs .nav-link.active {
+  background-color: transparent;
+  border-color: transparent;
+  border-bottom: 2px solid var(--neon-green);
+  color: var(--neon-green);
+}
+
+/* Form controls */
+.form-control,
+.form-select {
+  background-color: #252525;
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+.form-control:focus,
+.form-select:focus {
+  background-color: #2a2a2a;
+  border-color: var(--neon-green);
+  box-shadow: 0 0 0 0.25rem rgba(57, 255, 20, 0.25);
+  color: var(--text-primary);
+}
+
+.form-check-input {
+  background-color: #333;
+  border-color: #666;
+}
+
+.form-check-input:checked {
+  background-color: var(--neon-green);
+  border-color: var(--neon-green);
+}
+
+/* Alerts */
+.alert-info {
+  background-color: #193249;
+  border-color: #154875;
+  color: #8bb9e0;
+}
+
+.alert-danger {
+  background-color: #3a1c1c;
+  border-color: #5c2b2b;
+  color: #ea9999;
+}
+
+/* Badge styling */
+.badge {
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.bg-info {
+  background-color: #0288d1 !important;
+}
+
+/* App logo */
+img[src="/logo.png"] {
+  filter: drop-shadow(0 0 8px rgba(57, 255, 20, 0.5));
+}
+
+/* Dropdown styling */
+.dropdown-menu {
+  background-color: #252525;
+  border: 1px solid var(--border-color);
+}
+
+.dropdown-item {
+  color: var(--text-primary);
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+  background-color: #333;
+  color: var(--neon-green);
+}
+
+.dropdown-item.active {
+  background-color: var(--neon-green);
+  color: var(--darker-bg);
+}
+
+/* Spinner */
+.spinner-border {
+  color: var(--neon-green);
+}
+
+/* Rules page styling */
+h2,
+h4 {
+  color: var(--neon-green);
+  margin-bottom: 1.5rem;
+}
+
+h4.text-danger {
+  color: #ff5252 !important;
+}
+
+ul li {
+  margin-bottom: 0.75rem;
+}
+
+strong {
+  color: var(--neon-green);
+}
+
+/* Media queries */
 @media (max-width: 1200px) {
   .overall-position {
     font-size: 1.6rem;
@@ -249,7 +485,6 @@ body {
   }
 }
 
-/* MD - até 992px */
 @media (max-width: 992px) {
   .overall-position {
     font-size: 1.6rem;
@@ -264,7 +499,6 @@ body {
   }
 }
 
-/* SM - até 768px */
 @media (max-width: 768px) {
   .overall-position {
     font-size: 1.4rem;
@@ -283,7 +517,6 @@ body {
   }
 }
 
-/* XS - até 576px */
 @media (max-width: 576px) {
   .container {
     padding-left: 10px;

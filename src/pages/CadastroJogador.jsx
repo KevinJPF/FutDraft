@@ -1,6 +1,6 @@
 // src/pages/CadastroJogador.jsx
 import React, { useState } from "react";
-import { Form, Button, Card, ProgressBar, Alert, Image } from "react-bootstrap";
+import { Form, Button, Alert, Image } from "react-bootstrap";
 import {
   cadastrarJogador,
   calcularMediaGeral,
@@ -10,7 +10,7 @@ const CadastroJogador = () => {
   const [jogador, setJogador] = useState({
     nome: "",
     posicao: "DEF",
-    imagem: "", // URL da imagem
+    imagem: "",
     habilidades: {
       velocidade: 50,
       chute: 50,
@@ -114,44 +114,70 @@ const CadastroJogador = () => {
 
   // Cor do overall (estilo FIFA)
   const getOverallColor = (valor) => {
-    if (valor >= 85) return "#00a651"; // Verde escuro
-    if (valor >= 75) return "#8dc63f"; // Verde claro
-    if (valor >= 65) return "#ffc20e"; // Amarelo
-    if (valor >= 50) return "#f7941d"; // Laranja
+    if (valor >= 80) return "#00a651"; // Verde escuro
+    if (valor >= 70) return "#8dc63f"; // Verde claro
+    if (valor >= 60) return "#ffc20e"; // Amarelo
+    if (valor >= 40) return "#f7941d"; // Laranja
     return "#ed1c24"; // Vermelho
   };
 
   return (
-    <div className="row justify-content-center">
-      <div className="col-md-10 col-lg-8">
-        <h2 className="text-center mb-4">Cadastrar Jogador</h2>
+    <div className="container py-4">
+      <div className="row justify-content-center">
+        <div className="col-md-10 col-lg-8">
+          <h2
+            className="text-center mb-4"
+            style={{
+              color: "#39ff14",
+              textShadow: "0 0 10px rgba(57, 255, 20, 0.5)",
+            }}
+          >
+            Cadastrar Jogador
+          </h2>
 
-        {error && <Alert variant="danger">{error}</Alert>}
-        {success && <Alert variant="success">{success}</Alert>}
+          {error && <Alert variant="danger">{error}</Alert>}
+          {success && <Alert variant="success">{success}</Alert>}
 
-        <Card className="shadow">
-          <Card.Body>
-            <Form onSubmit={handleSubmit}>
-              <div className="row">
+          <div className="bg-transparent">
+            <Form onSubmit={handleSubmit} className="p-3">
+              <div className="row g-4">
                 {/* Coluna de dados básicos */}
                 <div className="col-md-6">
-                  <Form.Group className="mb-3">
-                    <Form.Label>Nome do Jogador</Form.Label>
+                  <Form.Group className="mb-4">
+                    <Form.Label style={{ color: "#b0b0b0" }}>
+                      Nome do Jogador
+                    </Form.Label>
                     <Form.Control
                       type="text"
                       name="nome"
                       value={jogador.nome}
                       onChange={handleChange}
                       required
+                      className="border-dark"
+                      style={{
+                        backgroundColor: "#1e1e1e",
+                        color: "#f8f8f8",
+                        borderBottom: "2px solid #39ff14",
+                        borderRadius: "4px",
+                        transition: "all 0.3s ease",
+                      }}
                     />
                   </Form.Group>
 
-                  <Form.Group className="mb-3">
-                    <Form.Label>Posição</Form.Label>
+                  <Form.Group className="mb-4">
+                    <Form.Label style={{ color: "#b0b0b0" }}>
+                      Posição
+                    </Form.Label>
                     <Form.Select
                       name="posicao"
                       value={jogador.posicao}
                       onChange={handleChange}
+                      style={{
+                        backgroundColor: "#1e1e1e",
+                        color: "#f8f8f8",
+                        borderBottom: "2px solid #39ff14",
+                        borderRadius: "4px",
+                      }}
                     >
                       <option value="DEF">Defesa</option>
                       <option value="MEI">Meia</option>
@@ -159,29 +185,48 @@ const CadastroJogador = () => {
                     </Form.Select>
                   </Form.Group>
 
-                  <Form.Group className="mb-3">
-                    <Form.Label>URL da Foto do Jogador</Form.Label>
+                  <Form.Group className="mb-4">
+                    <Form.Label style={{ color: "#b0b0b0" }}>
+                      URL da Foto do Jogador
+                    </Form.Label>
                     <Form.Control
                       type="url"
                       name="imagem"
                       value={jogador.imagem}
                       onChange={handleChange}
                       placeholder="https://exemplo.com/imagem.jpg"
+                      style={{
+                        backgroundColor: "#1e1e1e",
+                        color: "#f8f8f8",
+                        borderBottom: "2px solid #39ff14",
+                        borderRadius: "4px",
+                      }}
                     />
                     {jogador.imagem && (
                       <div className="mt-3 text-center">
-                        <Image
-                          src={jogador.imagem}
-                          alt="Preview"
-                          fluid
-                          thumbnail
-                          style={{ maxHeight: "200px" }}
-                          onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src =
-                              "https://via.placeholder.com/150?text=Imagem+Inválida";
+                        <div
+                          style={{
+                            border: "1px solid #333",
+                            padding: "5px",
+                            borderRadius: "5px",
+                            boxShadow: "0 0 10px rgba(57, 255, 20, 0.2)",
                           }}
-                        />
+                        >
+                          <Image
+                            src={jogador.imagem}
+                            alt="Preview"
+                            fluid
+                            style={{
+                              maxHeight: "200px",
+                              objectFit: "contain",
+                            }}
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src =
+                                "https://via.placeholder.com/150?text=Imagem+Inválida";
+                            }}
+                          />
+                        </div>
                       </div>
                     )}
                   </Form.Group>
@@ -189,51 +234,105 @@ const CadastroJogador = () => {
 
                 {/* Coluna de habilidades */}
                 <div className="col-md-6">
-                  <div className="text-center mb-3">
+                  <div className="text-center mb-4">
                     <div
-                      className="overall-badge mx-auto"
                       style={{
                         backgroundColor: getOverallColor(jogador.geral),
+                        color: "#0e0e0e",
+                        width: "60px",
+                        height: "60px",
+                        borderRadius: "50%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: "1.8rem",
+                        fontWeight: "bold",
+                        margin: "0 auto",
+                        boxShadow: `0 0 15px ${getOverallColor(jogador.geral)}`,
+                        transition: "all 0.3s ease",
                       }}
                     >
                       {jogador.geral}
                     </div>
-                    <div className="mt-2 text-muted">Média Geral</div>
+                    <div
+                      className="mt-2"
+                      style={{ color: "#b0b0b0", letterSpacing: "1px" }}
+                    >
+                      MÉDIA GERAL
+                    </div>
                   </div>
 
-                  {Object.entries(jogador.habilidades).map(
-                    ([habilidade, valor]) => (
-                      <Form.Group key={habilidade} className="mb-3">
-                        <div className="d-flex justify-content-between align-items-center">
-                          <Form.Label className="mb-0 text-capitalize">
-                            {habilidade}
-                          </Form.Label>
-                          <span
-                            className="badge"
-                            style={{ backgroundColor: getSkillColor(valor) }}
+                  <div
+                    className="py-2"
+                    style={{
+                      backgroundColor: "#1a1a1a",
+                      borderRadius: "8px",
+                      padding: "10px",
+                    }}
+                  >
+                    {Object.entries(jogador.habilidades).map(
+                      ([habilidade, valor]) => (
+                        <Form.Group key={habilidade} className="mb-3">
+                          <div className="d-flex justify-content-between align-items-center mb-1">
+                            <Form.Label
+                              className="mb-0 text-capitalize"
+                              style={{
+                                color: "#b0b0b0",
+                                letterSpacing: "0.5px",
+                              }}
+                            >
+                              {habilidade}
+                            </Form.Label>
+                            <div
+                              style={{
+                                backgroundColor: getSkillColor(valor),
+                                color: "#0e0e0e",
+                                padding: "2px 8px",
+                                borderRadius: "4px",
+                                fontWeight: "bold",
+                                minWidth: "40px",
+                                textAlign: "center",
+                                transition: "all 0.3s ease",
+                              }}
+                            >
+                              {valor}
+                            </div>
+                          </div>
+                          <Form.Range
+                            name={habilidade}
+                            value={valor}
+                            onChange={handleHabilidadeChange}
+                            min="0"
+                            max="99"
+                            style={{
+                              height: "32px",
+                              cursor: "pointer",
+                            }}
+                          />
+                          <div
+                            style={{
+                              height: "5px",
+                              backgroundColor: "#333",
+                              borderRadius: "3px",
+                              marginTop: "-10px",
+                              position: "relative",
+                            }}
                           >
-                            {valor}
-                          </span>
-                        </div>
-                        <Form.Range
-                          name={habilidade}
-                          value={valor}
-                          onChange={handleHabilidadeChange}
-                          min="0"
-                          max="99"
-                        />
-                        <ProgressBar
-                          now={valor}
-                          max={99}
-                          variant="success"
-                          style={{
-                            height: "8px",
-                            backgroundColor: "#e9ecef",
-                          }}
-                        />
-                      </Form.Group>
-                    )
-                  )}
+                            <div
+                              style={{
+                                height: "100%",
+                                width: `${valor}%`,
+                                backgroundColor: getSkillColor(valor),
+                                borderRadius: "3px",
+                                boxShadow: `0 0 5px ${getSkillColor(valor)}`,
+                                transition: "all 0.3s ease",
+                              }}
+                            />
+                          </div>
+                        </Form.Group>
+                      )
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -243,13 +342,22 @@ const CadastroJogador = () => {
                   type="submit"
                   size="lg"
                   disabled={loading}
+                  style={{
+                    backgroundColor: "#39ff14",
+                    borderColor: "#39ff14",
+                    color: "#121212",
+                    fontWeight: "600",
+                    borderRadius: "6px",
+                    boxShadow: "0 0 15px rgba(57, 255, 20, 0.5)",
+                    transition: "all 0.2s ease",
+                  }}
                 >
                   {loading ? "Salvando..." : "Cadastrar Jogador"}
                 </Button>
               </div>
             </Form>
-          </Card.Body>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   );

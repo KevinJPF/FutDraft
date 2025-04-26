@@ -1,75 +1,100 @@
 // src/pages/Home.jsx
 import React from "react";
-import { Card, Button } from "react-bootstrap";
+import { Card, Button, Container } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import logo from "/logo.png";
 
 const Home = () => {
   return (
-    <div className="text-center">
-      <h1 className="mb-4">
-        <img src={logo} alt="" style={{ height: "10rem" }} />
-      </h1>
+    <Container className="py-5">
+      <div className="text-center mb-5">
+        <img
+          src={logo}
+          alt="FutDraft Logo"
+          style={{
+            height: "12rem",
+            filter: "drop-shadow(0 0 12px rgba(57, 255, 20, 0.6))",
+          }}
+          className="mb-4"
+        />
+        <h1 className="display-4 fw-bold" style={{ color: "#39ff14" }}>
+          FutDraft
+        </h1>
+      </div>
 
-      <div className="row justify-content-center mt-5">
-        <div className="col-md-10">
-          <Card className="shadow">
-            <Card.Body>
-              <h2 className="mb-3">Bem-vindo ao FutDraft</h2>
-              <p className="mb-4">
-                Este aplicativo permite cadastrar jogadores com suas
-                habilidades, e sortear times equilibrados para suas partidas de
-                futebol.
+      <div className="row justify-content-center">
+        <div className="col-lg-8 col-md-10">
+          <Card className="shadow border-0">
+            <Card.Body className="p-4">
+              <h2 className="mb-4 text-center" style={{ color: "#39ff14" }}>
+                Bem-vindo ao FutDraft
+              </h2>
+              <p className="mb-5 text-center fs-5">
+                Cadastre jogadores com suas habilidades e sorteie times
+                equilibrados para suas partidas de futebol.
               </p>
 
-              <div className="d-flex flex-column flex-md-row justify-content-center gap-3 mb-3">
+              <div className="d-grid gap-4 mb-4">
                 <Button
                   as={Link}
-                  to="/cadastro"
+                  to="/regras"
                   variant="primary"
                   size="lg"
-                  className="w-100"
+                  className="py-3 fw-bold"
                 >
-                  <i className="bi bi-person-plus-fill me-2"></i>
-                  Cadastrar Jogador
+                  <i className="bi bi-shuffle me-2"></i>! Regras do Fut !
                 </Button>
+                <div className="d-flex flex-column flex-md-row gap-3">
+                  <Button
+                    as={Link}
+                    to="/jogadores"
+                    variant="secondary"
+                    size="lg"
+                    className="flex-grow-1 py-3"
+                    style={{ borderColor: "#39ff14", color: "#39ff14" }}
+                  >
+                    <i className="bi bi-people-fill me-2"></i>
+                    Ver Jogadores
+                  </Button>
+
+                  <Button
+                    as={Link}
+                    to="/cadastro"
+                    variant="secondary"
+                    size="lg"
+                    className="flex-grow-1 py-3"
+                    style={{ borderColor: "#39ff14", color: "#39ff14" }}
+                  >
+                    <i className="bi bi-person-plus-fill me-2"></i>
+                    Cadastrar Jogador
+                  </Button>
+                </div>
 
                 <Button
                   as={Link}
-                  to="/jogadores"
-                  variant="success"
+                  to="/sorteio"
+                  variant="primary"
                   size="lg"
-                  className="w-100"
+                  className="py-3 fw-bold"
                 >
-                  <i className="bi bi-people-fill me-2"></i>
-                  Ver Jogadores
+                  <i className="bi bi-shuffle me-2"></i>
+                  Sortear Times
                 </Button>
               </div>
-
-              <Button
-                as={Link}
-                to="/sorteio"
-                variant="danger"
-                size="lg"
-                className="w-100"
-              >
-                <i className="bi bi-shuffle me-2"></i>
-                Sortear Times
-              </Button>
             </Card.Body>
           </Card>
+
+          <div className="mt-4 text-center text-secondary">
+            <p>
+              <small>
+                Cadastre pelo menos 24 jogadores para poder realizar o sorteio
+                de times.
+              </small>
+            </p>
+          </div>
         </div>
       </div>
-
-      <div className="mt-4 text-muted">
-        <p>
-          <small>
-            Cadastre pelo menos 24 jogadores para poder realizar o sorteio de
-            times.
-          </small>
-        </p>
-      </div>
-    </div>
+    </Container>
   );
 };
 

@@ -275,8 +275,8 @@ const ListaJogadores = () => {
       {error && <Alert variant="danger">{error}</Alert>}
 
       {/* Barra de pesquisa e filtros básicos */}
-      <Card className="mb-3">
-        <Card.Body>
+      <Card className="mb-4 border-0 bg-transparent">
+        <Card.Body className="p-3 bg-dark rounded">
           <Row className="align-items-end">
             <Col md={4}>
               <Form.Group className="mb-2">
@@ -286,6 +286,7 @@ const ListaJogadores = () => {
                   placeholder="Digite um nome..."
                   value={termoBusca}
                   onChange={(e) => setTermoBusca(e.target.value)}
+                  className="bg-darker border-secondary text-white"
                 />
               </Form.Group>
             </Col>
@@ -295,6 +296,7 @@ const ListaJogadores = () => {
                 <Form.Select
                   value={posicaoFiltro}
                   onChange={(e) => setPosicaoFiltro(e.target.value)}
+                  className="bg-darker border-secondary text-white"
                 >
                   <option value="">Todas</option>
                   {posicoesDisponiveis.map((pos) => (
@@ -322,6 +324,7 @@ const ListaJogadores = () => {
                         min: parseInt(e.target.value, 10) || 0,
                       })
                     }
+                    className="bg-darker border-secondary text-white"
                   />
                   <Form.Control
                     type="number"
@@ -334,6 +337,7 @@ const ListaJogadores = () => {
                         max: parseInt(e.target.value, 10) || 0,
                       })
                     }
+                    className="bg-darker border-secondary text-white"
                   />
                 </div>
               </Form.Group>
@@ -348,35 +352,42 @@ const ListaJogadores = () => {
       </Card>
 
       {/* Barra de ordenação */}
-      <div className="d-flex flex-wrap gap-1 mb-3 bg-light p-2 rounded border">
-        <div className="me-2 align-self-center">
+      <div className="d-flex flex-wrap gap-2 mb-4 p-3 bg-dark rounded">
+        <div className="me-2 align-self-center text-primary">
           <strong>Ordenar por:</strong>
         </div>
         <Button
-          variant={
-            ordenacao.campo === "geral" ? "primary" : "outline-secondary"
-          }
+          variant={ordenacao.campo === "geral" ? "primary" : "outline-primary"}
           size="sm"
           onClick={() => alterarOrdenacao("geral")}
+          className={
+            ordenacao.campo === "geral" ? "text-dark fw-bold" : "text-white"
+          }
         >
           OVR{" "}
           {ordenacao.campo === "geral" &&
             (ordenacao.tipo === "asc" ? "↑" : "↓")}
         </Button>
         <Button
-          variant={ordenacao.campo === "nome" ? "primary" : "outline-secondary"}
+          variant={ordenacao.campo === "nome" ? "primary" : "outline-primary"}
           size="sm"
           onClick={() => alterarOrdenacao("nome")}
+          className={
+            ordenacao.campo === "nome" ? "text-dark fw-bold" : "text-white"
+          }
         >
           Nome{" "}
           {ordenacao.campo === "nome" && (ordenacao.tipo === "asc" ? "↑" : "↓")}
         </Button>
         <Button
           variant={
-            ordenacao.campo === "posicao" ? "primary" : "outline-secondary"
+            ordenacao.campo === "posicao" ? "primary" : "outline-primary"
           }
           size="sm"
           onClick={() => alterarOrdenacao("posicao")}
+          className={
+            ordenacao.campo === "posicao" ? "text-dark fw-bold" : "text-white"
+          }
         >
           Posição{" "}
           {ordenacao.campo === "posicao" &&
@@ -386,9 +397,12 @@ const ListaJogadores = () => {
         {ordemHabilidades.map((hab) => (
           <Button
             key={hab}
-            variant={ordenacao.campo === hab ? "primary" : "outline-secondary"}
+            variant={ordenacao.campo === hab ? "primary" : "outline-primary"}
             size="sm"
             onClick={() => alterarOrdenacao(hab)}
+            className={
+              ordenacao.campo === hab ? "text-dark fw-bold" : "text-white"
+            }
           >
             {traduzirHabilidade(hab)}{" "}
             {ordenacao.campo === hab && (ordenacao.tipo === "asc" ? "↑" : "↓")}
