@@ -30,8 +30,8 @@ const Home = () => {
                 Bem-vindo ao FutDraft
               </h2>
               <p className="mb-5 text-center fs-5">
-                Cadastre jogadores com suas habilidades e sorteie times
-                equilibrados para suas partidas de futebol.
+                Site para organizar o fut no Resenha em Poá, organizado por
+                Kevin e Alexandre.
               </p>
 
               <div className="d-grid gap-4 mb-4">
@@ -83,15 +83,6 @@ const Home = () => {
               </div>
             </Card.Body>
           </Card>
-
-          <div className="mt-4 text-center text-secondary">
-            <p>
-              <small>
-                Cadastre pelo menos 24 jogadores para poder realizar o sorteio
-                de times.
-              </small>
-            </p>
-          </div>
         </div>
       </div>
     </Container>

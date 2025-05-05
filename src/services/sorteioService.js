@@ -41,89 +41,191 @@ export const sortearTimes = (jogadores, jogadoresPorTime) => {
     return newArray;
   }
 
-  // Ordenar todos os jogadores por nivel geral (do melhor para o pior)
-  const jogadoresOrdenados = [...jogadores].sort((a, b) => b.geral - a.geral);
+  // Separar jogadores por prioridade
+  const jogadoresComPrioridade = jogadores.filter(j => j.prioridade);
+  const jogadoresSemPrioridade = jogadores.filter(j => !j.prioridade);
+
+  // Ordenar jogadores por nível geral (do melhor para o pior)
+  const jogadoresComPrioridadeOrdenados = [...jogadoresComPrioridade].sort((a, b) => b.geral - a.geral);
+  const jogadoresSemPrioridadeOrdenados = [...jogadoresSemPrioridade].sort((a, b) => b.geral - a.geral);
+
+  // Função para obter tops e bottoms de uma lista ordenada de jogadores
+  function separarTopEBottom(jogadoresOrdenados) {
+    if (jogadoresOrdenados.length <= 1) return { tops: jogadoresOrdenados, bottoms: [] };
+    
+    // Número de jogadores a considerar como tops/bottoms (no máximo 8 de cada ou metade do total)
+    const quantidade = Math.min(8, Math.floor(jogadoresOrdenados.length / 2));
+    
+    const tops = jogadoresOrdenados.slice(0, quantidade);
+    const bottoms = jogadoresOrdenados.slice(-quantidade);
+    
+    return { tops, bottoms };
+  }
+
+  // Separar tops e bottoms dos jogadores com prioridade
+  const { tops: topsPrioridade, bottoms: bottomsPrioridade } = separarTopEBottom(jogadoresComPrioridadeOrdenados);
   
-  // Selecionar o dobro de jogadores top e bottom necessários
-  const topNecessarios = totalDeTimes; // 1 por time
-  const bottomNecessarios = totalDeTimes; // 1 por time
-  const topParaSelecao = topNecessarios * 2; // Dobro de tops
-  const bottomParaSelecao = bottomNecessarios * 2; // Dobro de bottoms
+  // Separar tops e bottoms dos jogadores sem prioridade
+  const { tops: topsSemPrioridade, bottoms: bottomsSemPrioridade } = separarTopEBottom(jogadoresSemPrioridadeOrdenados);
+
+  // Embaralhar jogadores tops e bottoms
+  const topsPrioridadeEmbaralhados = embaralharArray([...topsPrioridade]);
+  const bottomsPrioridadeEmbaralhados = embaralharArray([...bottomsPrioridade]);
+  const topsSemPrioridadeEmbaralhados = embaralharArray([...topsSemPrioridade]);
+  const bottomsSemPrioridadeEmbaralhados = embaralharArray([...bottomsSemPrioridade]);
+
+  // Jogadores do meio (nem tops nem bottoms)
+  const jogadoresMeioPrioridade = jogadoresComPrioridadeOrdenados.filter(j => 
+    !topsPrioridade.some(top => top.id === j.id) && 
+    !bottomsPrioridade.some(bottom => bottom.id === j.id)
+  );
   
-  // Selecionar os N melhores e N piores jogadores
-  const jogadoresTop = jogadoresOrdenados.slice(0, topParaSelecao);
-  const jogadoresBottom = jogadoresOrdenados.slice(-bottomParaSelecao);
+  const jogadoresMeioSemPrioridade = jogadoresSemPrioridadeOrdenados.filter(j => 
+    !topsSemPrioridade.some(top => top.id === j.id) && 
+    !bottomsSemPrioridade.some(bottom => bottom.id === j.id)
+  );
+
+  // Embaralhar jogadores do meio
+  const jogadoresMeioPrioridadeEmbaralhados = embaralharArray([...jogadoresMeioPrioridade]);
+  const jogadoresMeioSemPrioridadeEmbaralhados = embaralharArray([...jogadoresMeioSemPrioridade]);
+
+  // Distribuir jogadores nos times
+  // Primeiro, distribuir alternadamente tops e bottoms com prioridade nos primeiros times
+  let indexTopPrioridade = 0;
+  let indexBottomPrioridade = 0;
   
-  // Embaralhar os jogadores top e bottom
-  const jogadoresTopEmbaralhados = embaralharArray([...jogadoresTop]);
-  const jogadoresBottomEmbaralhados = embaralharArray([...jogadoresBottom]);
-  
-  // Distribuir 1 top e 1 bottom para cada time
   for (let i = 0; i < totalDeTimes; i++) {
-    // Adicionar 1 jogador top para este time
-    times[i].jogadores.push(jogadoresTopEmbaralhados[i]);
+    const time = times[i];
     
-    // Adicionar 1 jogador bottom para este time
-    times[i].jogadores.push(jogadoresBottomEmbaralhados[i]);
-  }
-
-  // Identificar os jogadores já distribuídos
-  const jogadoresDistribuidosIds = times.flatMap(time => 
-    time.jogadores.map(jogador => jogador.id)
-  );
-
-  // Jogadores restantes incluem os top e bottom não escolhidos e os jogadores do meio
-  const jogadoresRestantesParaDistribuir = jogadores.filter(j => 
-    !jogadoresDistribuidosIds.includes(j.id)
-  );
-  
-  // Separar os jogadores restantes com e sem prioridade
-  const jogadoresRestantesComPrioridade = jogadoresRestantesParaDistribuir.filter(j => j.prioridade);
-  const jogadoresRestantesSemPrioridade = jogadoresRestantesParaDistribuir.filter(j => !j.prioridade);
-  
-  // Embaralhar os jogadores restantes
-  const jogadoresComPrioridadeEmbaralhados = embaralharArray([...jogadoresRestantesComPrioridade]);
-  const jogadoresSemPrioridadeEmbaralhados = embaralharArray([...jogadoresRestantesSemPrioridade]);
-
-  // Distribuir os jogadores restantes com prioridade para os times 1 e 2
-  let indexJogadoresComPrioridade = 0;
-  
-  for (let i = 0; i < Math.min(2, totalDeTimes); i++) {
-    while (times[i].jogadores.length < jogadoresPorTime && indexJogadoresComPrioridade < jogadoresComPrioridadeEmbaralhados.length) {
-      times[i].jogadores.push(jogadoresComPrioridadeEmbaralhados[indexJogadoresComPrioridade++]);
+    // Adicionar até 2 tops com prioridade (se disponíveis)
+    for (let j = 0; j < 2; j++) {
+      if (indexTopPrioridade < topsPrioridadeEmbaralhados.length) {
+        time.jogadores.push(topsPrioridadeEmbaralhados[indexTopPrioridade++]);
+      }
     }
-  }
-
-  // Distribuir os jogadores sem prioridade para os times 3 em diante
-  let indexJogadoresSemPrioridade = 0;
-  
-  for (let i = 2; i < totalDeTimes; i++) {
-    const limitePorTime = (i === totalDeTimes - 1 && jogadoresRestantes > 0) ? 
-      (jogadoresRestantes || jogadoresPorTime) : jogadoresPorTime;
     
-    while (times[i].jogadores.length < limitePorTime && indexJogadoresSemPrioridade < jogadoresSemPrioridadeEmbaralhados.length) {
-      times[i].jogadores.push(jogadoresSemPrioridadeEmbaralhados[indexJogadoresSemPrioridade++]);
+    // Adicionar até 2 bottoms com prioridade (se disponíveis)
+    for (let j = 0; j < 2; j++) {
+      if (indexBottomPrioridade < bottomsPrioridadeEmbaralhados.length) {
+        time.jogadores.push(bottomsPrioridadeEmbaralhados[indexBottomPrioridade++]);
+      }
     }
-  }
-
-  // Se ainda faltam jogadores sem prioridade e os times 1 e 2 não estão completos, preenchê-los
-  for (let i = 0; i < Math.min(2, totalDeTimes); i++) {
-    while (times[i].jogadores.length < jogadoresPorTime && indexJogadoresSemPrioridade < jogadoresSemPrioridadeEmbaralhados.length) {
-      times[i].jogadores.push(jogadoresSemPrioridadeEmbaralhados[indexJogadoresSemPrioridade++]);
-    }
-  }
-
-  // Se ainda faltam jogadores com prioridade e os times 3+ não estão completos, preenchê-los
-  for (let i = 2; i < totalDeTimes; i++) {
-    const limitePorTime = (i === totalDeTimes - 1 && jogadoresRestantes > 0) ? 
-      (jogadoresRestantes || jogadoresPorTime) : jogadoresPorTime;
     
-    while (times[i].jogadores.length < limitePorTime && indexJogadoresComPrioridade < jogadoresComPrioridadeEmbaralhados.length) {
-      times[i].jogadores.push(jogadoresComPrioridadeEmbaralhados[indexJogadoresComPrioridade++]);
+    // Parar se já distribuímos jogadores suficientes com prioridade
+    if (indexTopPrioridade >= topsPrioridadeEmbaralhados.length && 
+        indexBottomPrioridade >= bottomsPrioridadeEmbaralhados.length) {
+      break;
     }
   }
+  
+  // Se ainda sobraram tops/bottoms com prioridade, continuar distribuindo
+  for (let i = 0; i < totalDeTimes; i++) {
+    const time = times[i];
+    
+    while (time.jogadores.length < jogadoresPorTime) {
+      // Adicionar um top com prioridade se disponível
+      if (indexTopPrioridade < topsPrioridadeEmbaralhados.length) {
+        time.jogadores.push(topsPrioridadeEmbaralhados[indexTopPrioridade++]);
+        continue;
+      }
+      
+      // Adicionar um bottom com prioridade se disponível
+      if (indexBottomPrioridade < bottomsPrioridadeEmbaralhados.length) {
+        time.jogadores.push(bottomsPrioridadeEmbaralhados[indexBottomPrioridade++]);
+        continue;
+      }
+      
+      // Se não há mais tops/bottoms com prioridade, sair do loop
+      break;
+    }
+  }
+  
+  // Distribuir jogadores do meio com prioridade
+  let indexMeioPrioridade = 0;
+  
+  for (let i = 0; i < totalDeTimes; i++) {
+    const time = times[i];
+    
+    while (time.jogadores.length < jogadoresPorTime && indexMeioPrioridade < jogadoresMeioPrioridadeEmbaralhados.length) {
+      time.jogadores.push(jogadoresMeioPrioridadeEmbaralhados[indexMeioPrioridade++]);
+    }
+    
+    // Parar se já distribuímos todos os jogadores com prioridade
+    if (indexMeioPrioridade >= jogadoresMeioPrioridadeEmbaralhados.length) {
+      break;
+    }
+  }
+  
+  // Agora vamos lidar com jogadores sem prioridade (nos últimos times)
+  // Primeiro verificar quais times ainda precisam de jogadores
+  const timesIncompletos = times.filter(time => time.jogadores.length < jogadoresPorTime);
+  
+  // Distribuir jogadores sem prioridade do último time para o primeiro
+  const timesIncompletosReversos = [...timesIncompletos].reverse();
+  
+  let indexTopSemPrioridade = 0;
+  let indexBottomSemPrioridade = 0;
+  let indexMeioSemPrioridade = 0;
+  
+  for (const time of timesIncompletosReversos) {
+    // Adicionar tops sem prioridade
+    while (time.jogadores.length < jogadoresPorTime && indexTopSemPrioridade < topsSemPrioridadeEmbaralhados.length) {
+      time.jogadores.push(topsSemPrioridadeEmbaralhados[indexTopSemPrioridade++]);
+    }
+    
+    // Adicionar bottoms sem prioridade
+    while (time.jogadores.length < jogadoresPorTime && indexBottomSemPrioridade < bottomsSemPrioridadeEmbaralhados.length) {
+      time.jogadores.push(bottomsSemPrioridadeEmbaralhados[indexBottomSemPrioridade++]);
+    }
+    
+    // Adicionar jogadores do meio sem prioridade
+    while (time.jogadores.length < jogadoresPorTime && indexMeioSemPrioridade < jogadoresMeioSemPrioridadeEmbaralhados.length) {
+      time.jogadores.push(jogadoresMeioSemPrioridadeEmbaralhados[indexMeioSemPrioridade++]);
+    }
+  }
+  
+  // Reordenar os jogadores em cada time para seguir o padrão solicitado:
+  // 1 bom, 1 ruim, 1 bom, 1 ruim, seguido pelo restante
+  times.forEach(time => {
+    if (time.jogadores.length === 0) return;
+    
+    // Ordenar jogadores do time por nível (do melhor para o pior)
+    const jogadoresOrdenados = [...time.jogadores].sort((a, b) => b.geral - a.geral);
+    
+    // Pegar os 2 melhores e os 2 piores do time
+    const melhores = jogadoresOrdenados.slice(0, Math.min(2, jogadoresOrdenados.length));
+    const piores = jogadoresOrdenados.slice(-Math.min(2, jogadoresOrdenados.length));
+    
+    // Remover esses jogadores da lista
+    const restantes = jogadoresOrdenados.filter(j => 
+      !melhores.some(m => m.id === j.id) && 
+      !piores.some(p => p.id === j.id)
+    );
+    
+    // Criar a nova ordem: bom, ruim, bom, ruim, restante...
+    const novaOrdem = [];
+    
+    // Adicionar alternadamente bom/ruim
+    for (let i = 0; i < Math.min(melhores.length, piores.length); i++) {
+      if (i < melhores.length) novaOrdem.push(melhores[i]);
+      if (i < piores.length) novaOrdem.push(piores[i]);
+    }
+    
+    // Adicionar restantes de melhores/piores (caso um tenha mais elementos que o outro)
+    if (melhores.length > piores.length) {
+      novaOrdem.push(...melhores.slice(piores.length));
+    } else if (piores.length > melhores.length) {
+      novaOrdem.push(...piores.slice(melhores.length));
+    }
+    
+    // Adicionar os restantes
+    novaOrdem.push(...restantes);
+    
+    // Substituir a lista de jogadores do time
+    time.jogadores = novaOrdem;
+  });
 
-  // Calcular a média de geral de cada time
+  // Calcular a média de cada time
   times.forEach(time => {
     if (time.jogadores.length > 0) {
       const somaGeral = time.jogadores.reduce((acc, jogador) => acc + jogador.geral, 0);
